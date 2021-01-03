@@ -6,8 +6,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 
 import com.sigo.api.config.property.SigoApiProperty;
+import com.sigo.api.filters.SigoZuulFilter;
 
 @SpringBootApplication
 @EnableEurekaClient
@@ -24,5 +26,11 @@ public class SigoApiApplication {
 	public static <T> T getBean(Class<T> type) {
 		return APPLICATION_CONTEXT.getBean(type);
 	}
+	
+	  @Bean
+	  public SigoZuulFilter sigoZuulFilter() {
+	    return new SigoZuulFilter();
+	  }
+
 
 }

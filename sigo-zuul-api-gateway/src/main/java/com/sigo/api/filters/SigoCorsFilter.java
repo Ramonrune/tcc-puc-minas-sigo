@@ -1,4 +1,4 @@
-package com.sigo.api.cors;
+package com.sigo.api.filters;
 import java.io.IOException;
 
 import javax.servlet.Filter;

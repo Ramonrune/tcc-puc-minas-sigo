@@ -27,7 +27,16 @@ INSERT INTO filial values (1, 'IND TEXTIL BRA FILIAL MATRIZ', 'Rua do Abacaxi', 
 
 INSERT INTO filial values (2, 'IND TEXTIL BRA FILIAL FILIAL SP', 'Rua Joaquim', '165', null, 'Vila Santos', '13495014', 'Santa Barbara Do Oeste', 'SP');
 
+INSERT INTO filial values (3, 'IND TEXTIL BRA FILIAL FILIAL MT', 'Rua Cruzeiro', '98', null, 'Vila aparecida', '13455542', 'Cuiaba', 'MT');
+
 
 -- admin
 INSERT INTO usuario_filial (codigo_usuario, codigo_filial) values (1, 1);
 INSERT INTO usuario_filial (codigo_usuario, codigo_filial) values (1, 2);
+
+-- common user
+INSERT INTO usuario_filial (codigo_usuario, codigo_filial) values (2, 2);
+
+-- audit user
+INSERT INTO usuario_filial (codigo_usuario, codigo_filial) values (3, 3);
+
