@@ -1,12 +1,17 @@
 package com.sigo.api.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.envers.Audited;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 @Entity
 @Audited
@@ -21,9 +26,18 @@ public class Norma {
 	private String resumo;
 	private String descricao;
 	private String versao;
+	@Column(name = "numero_edicao")
 	private String numeroEdicao;
-	private Date dataEdicao;
-	private Date inicioValidade;
+
+	@JsonDeserialize(using= LocalDateDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@Column(name = "data_edicao")
+	private LocalDate dataEdicao;
+
+	@JsonDeserialize(using= LocalDateDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@Column(name = "inicio_validade")
+	private LocalDate inicioValidade;
 	private String categoria;
 
 	public Long getCodigo() {
@@ -82,19 +96,19 @@ public class Norma {
 		this.numeroEdicao = numeroEdicao;
 	}
 
-	public Date getDataEdicao() {
+	public LocalDate getDataEdicao() {
 		return dataEdicao;
 	}
 
-	public void setDataEdicao(Date dataEdicao) {
+	public void setDataEdicao(LocalDate dataEdicao) {
 		this.dataEdicao = dataEdicao;
 	}
 
-	public Date getInicioValidade() {
+	public LocalDate getInicioValidade() {
 		return inicioValidade;
 	}
 
-	public void setInicioValidade(Date inicioValidade) {
+	public void setInicioValidade(LocalDate inicioValidade) {
 		this.inicioValidade = inicioValidade;
 	}
 

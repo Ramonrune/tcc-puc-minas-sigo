@@ -1,6 +1,7 @@
 package com.sigo.api.resource;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -49,10 +50,21 @@ public class NormaResource {
 	}
 
 	@GetMapping
-	public ResponseEntity<?> findAll(@PathVariable Long codigo) {
+	public ResponseEntity<?> findAll() {
 		List<Norma> findAll = normaRepository.findAll();
 
+		findAll = findAll.stream().map(e -> {
+			
+			Norma norma = e;
+			
+			norma.setDescricao("");
+			
+			return norma;
+		}).collect(Collectors.toList());
+		
 		return ResponseEntity.ok(findAll);
 	}
+	
+	
 
 }

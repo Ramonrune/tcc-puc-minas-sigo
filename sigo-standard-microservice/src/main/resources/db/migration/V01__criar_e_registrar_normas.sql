@@ -5,9 +5,9 @@ CREATE TABLE norma(
     resumo VARCHAR(200) NOT NULL,
     descricao TEXT NOT NULL,
     versao VARCHAR(10) NOT NULL,
-    numeroEdicao VARCHAR(10) NOT NULL,
-    dataEdicao DATE NOT NULL,
-    inicioValidade DATE NOT NULL,
+    numero_edicao VARCHAR(10) NOT NULL,
+    data_edicao DATE NOT NULL,
+    inicio_validade DATE NOT NULL,
     categoria VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -21,7 +21,7 @@ Os requisitos do sistema de gestão da qualidade especificados nesta Norma são 
 As informações identificadas como "NOTA" se destinam a orientar o entendimento ou esclarecer o requisito
 associado.
 Esta Norma pode ser usada por partes internas ou externas, incluindo organismos de certificação, para avaliar a capacidade
-da organização de atender aos requisitos do cliente, os regulamentares e os da própria organização.', '2000', '1', '2000-12-01', '2001-01-29', 'QUALIDADE')
+da organização de atender aos requisitos do cliente, os regulamentares e os da própria organização.', '2000', '1', '2000-12-01', '2001-01-29', 'QUALIDADE');
 
 
 
@@ -35,7 +35,7 @@ de acordo com, por exemplo, o tipo e a duração do procedimento, o grau de umid
 de operação, o grau de tensão mecânica em materiais e da suscetibilidade do paciente à infecção.
 O uso de aventais cirúrgicos com resistência à penetração de líquidos pode também diminuir o risco
 à saúde da equipe de cirurgia, devido aos agentes infecciosos transportados no sangue ou outros
-fluidos corporais.', '2016', '3', '2016-10-26', '2016-10-26', 'TECNICA')
+fluidos corporais.', '2016', '3', '2016-10-26', '2016-10-26', 'TECNICA');
 
 
 
@@ -43,7 +43,7 @@ INSERT INTO norma VALUES(3, 'ABNT', 'ABNT NBR ISO 13688', 'Vestimentas de prote�
 para tamanhos, envelhecimento, compatibilidade e marcação da vestimenta de proteção, além das
 informações a serem fornecidas pelo fabricante em relação a vestimenta de proteção.
 Esta Norma é aplicável somente em combinação com outras normas que contenham requisitos
-específicos para o desempenho de proteção e não aplicada como uma Norma única.', '2017', '1', '2017-04-19', '2017-05-19', 'SEGURANCA')
+específicos para o desempenho de proteção e não aplicada como uma Norma única.', '2017', '1', '2017-04-19', '2017-05-19', 'SEGURANCA');
 
 
 
@@ -53,7 +53,7 @@ facial tipo tela — Requisitos', 'Esta Norma estabelece os requisitos para prot
 design, desempenho métodos de ensaio e marcação.
 Esta Norma não se aplica aos protetores faciais e oculares para uso contra respingo de líquidos
 (incluindo metais derretidos), riscos de sólidos quentes, perigos elétricos, radiação de infravermelho
-e ultravioleta, bem como para uso em esportes, como hóquei e esgrima.', '2015', '1', '2015-04-07', '2015-05-07', 'SEGURANCA')
+e ultravioleta, bem como para uso em esportes, como hóquei e esgrima.', '2015', '1', '2015-04-07', '2015-05-07', 'SEGURANCA');
 
 
 
@@ -62,11 +62,11 @@ INSERT INTO norma VALUES(5, 'ABNT', 'ABNT NBR ISO 26000', 'Diretrizes sobre resp
 responsabilidade social e o engajamento das partes interessadas, os temas centrais e as questões pertinentes à
 responsabilidade social (ver Tabela 2) e formas de integrar o comportamento socialmente responsável na
 organização (ver Figura 1). Esta Norma salienta a importância de resultados e melhorias no desempenho em
-responsabilidade social.', '2010', '1', '2010-11-01', '2010-12-01', 'RESPONSABILIDADE SOCIAL')
+responsabilidade social.', '2010', '1', '2010-11-01', '2010-12-01', 'RESPONSABILIDADE SOCIAL');
 
 
 INSERT INTO norma VALUES(6, 'ABNT', 'ABNT NBR 15599', 'Acessibilidade - Comunicação na prestação
 de serviços', 'Esta Norma fornece diretrizes que promovem a acessibilidade na prestação de sewiços, contornando as barreiras
 de comunicação existentes, por meio do princípio da redundância. Destina-se ao uso pelos prestadores de serviço
 que buscam o atendimento a demanda das pessoas com dificuldades na comunicação, potencial mercado,
-e a legislação pertinente em vigor.', '2008', '1', '2008-08-25', '2008-09-25', 'ACESSIBILIDADE')
+e a legislação pertinente em vigor.', '2008', '1', '2008-08-25', '2008-09-25', 'ACESSIBILIDADE');
