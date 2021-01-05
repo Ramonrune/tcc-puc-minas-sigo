@@ -29,7 +29,10 @@ public class AlgamoneyApiApplicationTests {
 	@Test
 	public void contextLoads() throws IOException {
 
-		
+		String username = "***REMOVED***";
+		String password = "***REMOVED***";
+		String host = "***REMOVED***";
+		int port = 443;
 	
 
 		CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
