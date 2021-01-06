@@ -1,4 +1,4 @@
-package com.algaworks.algamoney.api;
+package com.sigo.api;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +12,7 @@ import com.sigo.api.repository.UsuarioRepository;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class AlgamoneyApiApplicationTests {
+public class SigoTests {
 
 	
 	@Test

@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("sigo")
 public class SigoApiProperty {
 
-	private String originPermitida = "http://localhost:4200";
+	private String originPermitida = "http://localhost:8080";
 
 	private final Seguranca seguranca = new Seguranca();
 

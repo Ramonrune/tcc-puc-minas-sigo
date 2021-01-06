@@ -17,13 +17,11 @@
           shrink
           class="row items-center no-wrap"
         >
-          
           <span class="q-ml-sm">Sistema Integrado de Gestão e Operação</span>
         </q-toolbar-title>
 
         <q-space />
 
-        
         <q-space />
 
         <div class="q-gutter-sm row items-center no-wrap">
@@ -45,7 +43,17 @@
             <q-avatar size="26px">
               <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
             </q-avatar>
-            <q-tooltip>Account</q-tooltip>
+            <q-tooltip>{{ this.userName }}</q-tooltip>
+            <q-menu auto-close>
+              <q-list dense style="min-width: 100px">
+                <q-item clickable class="GL__menu-link">
+                  <q-item-section>Perfil</q-item-section>
+                </q-item>
+                <q-item clickable class="GL__menu-link" @click="this.loggout">
+                  <q-item-section>Sair</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
           </q-btn>
         </div>
       </q-toolbar>
@@ -67,14 +75,14 @@
             :key="link.text"
             clickable
             :to="link.to"
-            style="text-decoration: none;"
+            style="text-decoration: none"
           >
-                <q-item-section avatar>
-                  <q-icon :name="link.icon" />
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ link.text }}</q-item-label>
-                </q-item-section>
+            <q-item-section avatar>
+              <q-icon :name="link.icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ link.text }}</q-item-label>
+            </q-item-section>
           </q-item>
 
           <q-separator inset class="q-my-sm" />
@@ -85,8 +93,8 @@
             v-for="link in links2"
             :key="link.text"
             clickable
-             :to="link.to"
-            style="text-decoration: none;"
+            :to="link.to"
+            style="text-decoration: none"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />
@@ -104,8 +112,8 @@
             v-for="link in links3"
             :key="link.text"
             clickable
-             :to="link.to"
-            style="text-decoration: none;"
+            :to="link.to"
+            style="text-decoration: none"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />
@@ -123,8 +131,8 @@
             v-for="link in links4"
             :key="link.text"
             clickable
-             :to="link.to"
-            style="text-decoration: none;"
+            :to="link.to"
+            style="text-decoration: none"
           >
             <q-item-section avatar>
               <q-icon :name="link.icon" />
@@ -171,9 +179,13 @@
 <script>
 import { fasGlobeAmericas, fasFlask } from "@quasar/extras/fontawesome-v5";
 export default {
-  name: "GoogleNewsLayout",
+  name: "MainLayout",
+  mounted() {
+    this.userName = localStorage.getItem("NAME");
+  },
   data() {
     return {
+      userName: "Usuário",
       leftDrawerOpen: false,
       search: "",
       showAdvanced: false,
@@ -184,32 +196,39 @@ export default {
       byWebsite: "",
       byDate: "Any time",
       links1: [
-        { icon: "web", text: "Painel", to: "/" },
-        { icon: "person", text: "Usuários", to: "usuarios" },
-        { icon: "domain", text: "Filiais", to: "filiais" },
-        { icon: "bar_chart", text: "Relatórios", to: "relatorios" },
+        { icon: "web", text: "Painel", to: "/sigo" },
+        { icon: "person", text: "Usuários", to: "/sigo/usuarios" },
+        { icon: "domain", text: "Filiais", to: "/sigo/filiais" },
+        { icon: "bar_chart", text: "Relatórios", to: "/sigo/relatorios" },
       ],
       links2: [
-        { icon: "view_list", text: "Processos", to: "processos" },
-        { icon: "warning", text: "Ocorrências", to: "ocorrencias" },
+        { icon: "view_list", text: "Processos", to: "/sigo/processos" },
+        { icon: "warning", text: "Ocorrências", to: "/sigo/ocorrencias" },
       ],
-      links3: [{ icon: "book", text: "Normas técnicas", to: "normas" }],
+      links3: [{ icon: "book", text: "Normas técnicas", to: "/sigo/normas" }],
       links4: [
-        { icon: "supervisor_account", text: "Consultoria", to: "consultoria" },
+        {
+          icon: "supervisor_account",
+          text: "Consultoria",
+          to: "/sigo/consultoria",
+        },
       ],
     };
   },
   methods: {
-    onClear() {
-      this.exactPhrase = "";
-      this.hasWords = "";
-      this.excludeWords = "";
-      this.byWebsite = "";
-      this.byDate = "Any time";
-    },
-    changeDate(option) {
-      this.byDate = option;
-      this.showDateOptions = false;
+    async loggout() {
+      let response = await this.$axios.delete ('/tokens/revoke',
+      {
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),
+        }
+      });
+
+      console.log(response);
+      localStorage.setItem("TOKEN", null);
+      localStorage.setItem("CODE", null);
+      localStorage.setItem("NAME", null);
+      window.location.href = "/";
     },
   },
 };

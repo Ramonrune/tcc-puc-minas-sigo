@@ -14,6 +14,7 @@
           <th class="text-left">Nome</th>
           <th class="text-left">Cidade</th>
           <th class="text-left">Estado</th>
+          <th class="text-left">Endereço</th>
           <th class="text-left">Criado em</th>
           <th class="text-left">Ações</th>
         </tr>
@@ -24,6 +25,8 @@
           <td class="text-left">Americana</td>
           <td class="text-left">SP</td>
           <td class="text-left">20/01/2020</td>
+          <td class="text-left">Rua XYZ, Bairro XYZ</td>
+
           <td class="text-left q-gutter-xs">
             <q-btn color="primary" label="Visualizar" dense />
             <q-btn color="teal" label="Editar" dense />
