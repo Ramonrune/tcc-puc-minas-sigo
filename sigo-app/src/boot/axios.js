@@ -10,3 +10,4 @@ const client = axios.create({
 
 
 Vue.prototype.$axios = client
+

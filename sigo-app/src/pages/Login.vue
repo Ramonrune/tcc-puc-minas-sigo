@@ -58,6 +58,9 @@
 </template>
 
 <script>
+import { login } from "../services/Login";
+import { getUserInfo } from "../services/Usuario";
+
 export default {
   name: "Login",
 
@@ -67,11 +70,11 @@ export default {
       password: "admin",
     };
   },
- 
+
   beforeMount() {
     let token = localStorage.getItem("TOKEN");
 
-    if (token != 'null' && token != null) {
+    if (token != "null" && token != null) {
       window.location.href = "#/sigo";
     }
   },
@@ -101,28 +104,30 @@ export default {
         return;
       }
 
-      const params = new URLSearchParams();
-      params.append("username", this.email);
-      params.append("password", this.password);
-      params.append("grant_type", "password");
-
-      const config = {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: "Basic c2lnbzpzaWdv",
-        },
-      };
-
-      let response = await this.$axios.post(`/oauth/token`, params, config);
-      console.log(response);
-      if (response.status == 200) {
+      let response = await login(this.email, this.password);
+      if (response != null && response.status == 200) {
         let { access_token, codigo, nome } = response.data;
-
         localStorage.setItem("TOKEN", access_token);
         localStorage.setItem("CODE", codigo);
         localStorage.setItem("NAME", nome);
 
-        window.location.href = "#/sigo";
+        let responseUserInfo = await getUserInfo();
+
+        if (responseUserInfo != null) {
+          localStorage.setItem(
+            "USER_DATA",
+            JSON.stringify(responseUserInfo.data)
+          );
+          window.location.href = "#/sigo";
+        } else {
+          this.$q.notify({
+            color: "negative",
+            message:
+              "Ocorreu um problema no login, tente novamente mais tarde!",
+            position: "top",
+            timeout: 1000,
+          });
+        }
       } else {
         if (response.status == 400) {
           this.$q.notify({

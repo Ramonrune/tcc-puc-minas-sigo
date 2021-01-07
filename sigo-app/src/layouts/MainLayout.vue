@@ -217,7 +217,7 @@ export default {
   },
   methods: {
     async loggout() {
-      let response = await this.$axios.delete ('/tokens/revoke',
+     /* let response = await this.$axios.delete ('/tokens/revoke',
       {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),
@@ -225,6 +225,8 @@ export default {
       });
 
       console.log(response);
+      
+      */
       localStorage.setItem("TOKEN", null);
       localStorage.setItem("CODE", null);
       localStorage.setItem("NAME", null);

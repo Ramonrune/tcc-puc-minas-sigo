@@ -15,6 +15,9 @@ public class Filial {
 	private Long codigo;
 
 	private String nome;
+	private String cnpj;
+	private String telefone;
+
 	private String logradouro;
 	private String numero;
 	private String complemento;
@@ -29,6 +32,22 @@ public class Filial {
 
 	public void setCodigo(Long codigo) {
 		this.codigo = codigo;
+	}
+
+	public String getTelefone() {
+		return telefone;
+	}
+
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
+	}
+
+	public void setTelefone(String telefone) {
+		this.telefone = telefone;
 	}
 
 	public String getNome() {

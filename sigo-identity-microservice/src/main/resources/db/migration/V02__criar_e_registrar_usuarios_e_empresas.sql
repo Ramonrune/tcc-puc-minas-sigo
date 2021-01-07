@@ -1,13 +1,15 @@
 CREATE TABLE filial(
 	codigo BIGINT(20) PRIMARY KEY,
    	nome VARCHAR(100) NOT NULL,
-    logradouro VARCHAR(200),
-    numero VARCHAR(30),
+   	cnpj VARCHAR(14) NOT NULL,
+   	telefone VARCHAR(10) NOT NULL,
+    logradouro VARCHAR(200) NOT NULL,
+    numero VARCHAR(30) NOT NULL,
     complemento VARCHAR(30),
-    bairro VARCHAR(30),
-    cep VARCHAR(10),
-    cidade VARCHAR(100),
-    estado VARCHAR(2)
+    bairro VARCHAR(30) NOT NULL,
+    cep VARCHAR(10) NOT NULL,
+    cidade VARCHAR(100) NOT NULL,
+    estado VARCHAR(2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -23,11 +25,11 @@ CREATE TABLE usuario_filial(
 
 
 
-INSERT INTO filial values (1, 'IND TEXTIL BRA FILIAL MATRIZ', 'Rua do Abacaxi', '10', null, 'Vila uberlandia', '15076610', 'Uberlândia', 'MG');
+INSERT INTO filial values (1, 'IND TEXTIL BRA FILIAL MATRIZ', '11253910000100', '1936459991',  'Rua do Abacaxi', '10', null, 'Vila uberlandia', '15076610', 'Uberlândia', 'MG');
 
-INSERT INTO filial values (2, 'IND TEXTIL BRA FILIAL FILIAL SP', 'Rua Joaquim', '165', null, 'Vila Santos', '13495014', 'Santa Barbara Do Oeste', 'SP');
+INSERT INTO filial values (2, 'IND TEXTIL BRA FILIAL FILIAL SP', '09469704000182', '1936459992', 'Rua Joaquim', '165', null, 'Vila Santos', '13495014', 'Santa Barbara Do Oeste', 'SP');
 
-INSERT INTO filial values (3, 'IND TEXTIL BRA FILIAL FILIAL MT', 'Rua Cruzeiro', '98', null, 'Vila aparecida', '13455542', 'Cuiaba', 'MT');
+INSERT INTO filial values (3, 'IND TEXTIL BRA FILIAL FILIAL MT', '03401886000173', '1936459993', 'Rua Cruzeiro', '98', null, 'Vila aparecida', '13455542', 'Cuiaba', 'MT');
 
 
 -- admin
