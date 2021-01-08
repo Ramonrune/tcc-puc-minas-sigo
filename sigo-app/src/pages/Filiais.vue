@@ -8,7 +8,10 @@
       label="Nova filial"
       dense
       class="float-right"
-      @click="showCompanyWindow = true"
+      @click="
+        mode = 'ADD';
+        showCompanyWindow = true;
+      "
     />
 
     <br />
@@ -46,8 +49,21 @@
           <td class="text-left">{{ company.estado }}</td>
 
           <td class="text-left q-gutter-xs">
-            <q-btn color="teal" label="Editar" dense />
-            <q-btn color="red" label="Excluir" dense />
+            <q-btn
+              color="teal"
+              label="Editar"
+              dense
+              @click="showEdit(company)"
+            />
+            <q-btn
+              color="red"
+              label="Excluir"
+              dense
+              @click="
+                companyToExclude = company;
+                showCompanyRemoveWindow = true;
+              "
+            />
           </td>
         </tr>
       </tbody>
@@ -55,7 +71,9 @@
     <q-dialog v-model="showCompanyWindow" persistent>
       <q-card>
         <q-card-section class="row items-center">
-          <span class="text-bold text-h5">Nova filial</span>
+          <span class="text-bold text-h5">{{
+            mode == "ADD" ? "Nova filial" : "Editar filial"
+          }}</span>
         </q-card-section>
 
         <q-card-section>
@@ -74,6 +92,7 @@
               class="col-4"
               mask="##.###.###/####-##"
               @input="onCepChange"
+              :disable="mode == 'ADD' ? false : true"
             />
 
             <q-input
@@ -135,8 +154,42 @@
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn label="Cancelar" color="red" v-close-popup />
-          <q-btn label="Cadastrar" color="primary" @click="validate" />
+          <q-btn
+            label="Cancelar"
+            color="red"
+            v-close-popup
+            @click="resetForm"
+          />
+          <q-btn
+            :label="mode == 'ADD' ? 'Cadastrar' : 'Editar'"
+            color="primary"
+            @click="validate"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="showCompanyRemoveWindow" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <span class="text-bold text-h5">Excluir filial</span>
+        </q-card-section>
+
+        <q-card-section v-if="companyToExclude != null">
+          <div>
+            Tem certeza que deseja excluir a filial
+            {{ companyToExclude.nome }} ?
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+            label="Não"
+            color="red"
+            v-close-popup
+            @click="companyToExclude = null"
+          />
+          <q-btn label="Sim" color="primary" @click="removeCompany" />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -145,7 +198,13 @@
 <script>
 import axios from "axios";
 import { cnpjValidation } from "../util/validadorCnpj";
-import { addNewCompany, getCompanies, companyExists } from "../services/Filial";
+import {
+  addNewCompany,
+  editCompany,
+  getCompanies,
+  companyExists,
+  deleteCompany
+} from "../services/Filial";
 
 export default {
   name: "Filiais",
@@ -154,6 +213,10 @@ export default {
     return {
       companyList: [],
       showCompanyWindow: false,
+      showCompanyRemoveWindow: false,
+      companyToExclude: null,
+      mode: "",
+
       stateOptions: [
         { label: "Acre", value: "AC" },
         { label: "Alagoas", value: "AL" },
@@ -202,6 +265,58 @@ export default {
     await this.refreshList();
   },
   methods: {
+    resetForm() {
+      this.newCompany = {
+        nome: "",
+        cnpj: "",
+        telefone: "",
+        logradouro: "",
+        numero: "",
+        complemento: "",
+        bairro: "",
+        cep: "",
+        cidade: "",
+        estado: { label: "São Paulo", value: "SP" },
+      };
+    },
+    showEdit(company) {
+      this.mode = "EDIT";
+      const cloneCompany = { ...company };
+
+      this.newCompany = cloneCompany;
+      this.newCompany.estado = this.stateOptions.filter(
+        (e) => e.value == cloneCompany.estado
+      )[0];
+      this.newCompany.telefone =  cloneCompany.telefone.replace(/^(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
+      this.newCompany.cep =  cloneCompany.cep.replace(/^(\d{5})(\d{3})/, "$1-$2");
+
+      console.log(this.newCompany);
+      this.showCompanyWindow = true;
+    },
+    async removeCompany() {
+      let response = await deleteCompany(this.companyToExclude.codigo);
+      this.companyToExclude = null;
+      this.showCompanyRemoveWindow = false;
+
+      if (response != null && response.status == 204) {
+        await this.refreshList();
+        this.$q.notify({
+          color: "positive",
+          message: "Filial excluida com sucesso!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      } else {
+        this.$q.notify({
+          color: "negative",
+          message:
+            "Ocorreu um problema ao remover a filial, tente novamente mais tarde!",
+          position: "top",
+          timeout: 1000,
+        });
+      }
+    },
     async refreshList() {
       this.companyList = await getCompanies();
     },
@@ -254,15 +369,17 @@ export default {
         return;
       }
 
-      let companyExists = await this.cnpjExists(this.newCompany.cnpj);
-      if (companyExists) {
-        this.$q.notify({
-          color: "negative",
-          message: "Filial já cadastrada",
-          position: "top",
-          timeout: 1000,
-        });
-        return;
+      if (this.mode == "ADD") {
+        let companyExists = await this.cnpjExists(this.newCompany.cnpj);
+        if (companyExists) {
+          this.$q.notify({
+            color: "negative",
+            message: "Filial já cadastrada",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
       }
 
       if (this.newCompany.telefone.length != 14) {
@@ -335,7 +452,7 @@ export default {
         return;
       }
 
-      const body = {
+      let body = {
         nome: this.newCompany.nome,
         cnpj: this.newCompany.cnpj.match(/\d/g).join(""),
         telefone: this.newCompany.telefone.match(/\d/g).join(""),
@@ -348,39 +465,80 @@ export default {
         estado: this.newCompany.estado.value,
       };
 
-      let response = await addNewCompany(body);
-      if (response != null && response.status == 201) {
-        this.$q.notify({
-          color: "positive",
-          message: "Filial cadastrada com sucesso!",
-          position: "top",
-          timeout: 1000,
-        });
-        this.newCompany = {
-          nome: "",
-          cnpj: "",
-          telefone: "",
-          logradouro: "",
-          numero: "",
-          complemento: "",
-          bairro: "",
-          cep: "",
-          cidade: "",
-          estado: { label: "São Paulo", value: "SP" },
-        };
+      if (this.mode == "ADD") {
+        let response = await addNewCompany(body);
+        if (response != null && response.status == 201) {
+          this.$q.notify({
+            color: "positive",
+            message: "Filial cadastrada com sucesso!",
+            position: "top",
+            timeout: 1000,
+          });
+          this.newCompany = {
+            nome: "",
+            cnpj: "",
+            telefone: "",
+            logradouro: "",
+            numero: "",
+            complemento: "",
+            bairro: "",
+            cep: "",
+            cidade: "",
+            estado: { label: "São Paulo", value: "SP" },
+          };
 
-        this.showCompanyWindow = false;
-        await this.refreshList();
-      } else {
-        this.$q.notify({
-          color: "negative",
-          message:
-            "Ocorreu um problema ao cadastrar uma nova filial, tente novamente mais tarde!",
-          position: "top",
-          timeout: 1000,
-        });
-        return;
+          this.showCompanyWindow = false;
+          await this.refreshList();
+        } else {
+          this.$q.notify({
+            color: "negative",
+            message:
+              "Ocorreu um problema ao cadastrar uma nova filial, tente novamente mais tarde!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
       }
+
+      if (this.mode == "EDIT") {
+        body.codigo = this.newCompany.codigo;
+        let response = await editCompany(body);
+        if (response != null && response.status == 200) {
+          this.$q.notify({
+            color: "positive",
+            message: "Filial editada com sucesso!",
+            position: "top",
+            timeout: 1000,
+          });
+          this.newCompany = {
+            nome: "",
+            cnpj: "",
+            telefone: "",
+            logradouro: "",
+            numero: "",
+            complemento: "",
+            bairro: "",
+            cep: "",
+            cidade: "",
+            estado: { label: "São Paulo", value: "SP" },
+          };
+
+          this.showCompanyWindow = false;
+          await this.refreshList();
+        } else {
+          this.$q.notify({
+            color: "negative",
+            message:
+              "Ocorreu um problema ao editar a filial, tente novamente mais tarde!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
+      }
+
+      this.mode = "";
     },
   },
 };

@@ -8,6 +8,23 @@ const client = axios.create({
 });
 
 
+client.interceptors.response.use(
+	res => res,
+	err => {
+
+		if (err.response) {
+			if (err.response.status === 401) {
+				localStorage.setItem("TOKEN", null);
+				localStorage.setItem("CODE", null);
+				localStorage.setItem("NAME", null);
+				window.location.href = "/";
+
+			}
+		}
+
+	});
+
+
 
 Vue.prototype.$axios = client
 

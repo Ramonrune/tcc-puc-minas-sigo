@@ -1,24 +1,23 @@
 package com.sigo.api.resource;
 
-import java.util.Enumeration;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties.Jwt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.jwt.JwtHelper;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sigo.api.model.JsonWebToken;
@@ -49,6 +48,24 @@ public class UsuarioResource {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
 	}
+	
+	@PutMapping("/{codigo}")
+	public ResponseEntity<?> edit(@PathVariable Long codigo, @Valid @RequestBody Usuario usuario, @RequestHeader(name = "Authorization") String token) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+
+		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		Usuario user = usuarioRepository.findOne(codigo);
+		if(user != null) {
+			usuario.setSenha(user.getSenha());
+		}
+		Usuario newUsuario = usuarioRepository.save(usuario);
+
+		return ResponseEntity.status(HttpStatus.OK).body(newUsuario);
+
+	}
 
 	@GetMapping("/info")
 	public ResponseEntity<?> getUserInfo(@RequestHeader(name = "Authorization") String token) {
@@ -73,4 +90,37 @@ public class UsuarioResource {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}
+	
+	@GetMapping("exists/{email}")
+	public ResponseEntity<?> find(@RequestHeader(name = "Authorization") String token, @PathVariable String email) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+
+		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		Optional<Usuario> findByEmail = usuarioRepository.findByEmail(email);
+		
+		return findByEmail.isPresent() ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+	}
+
+	
+	@GetMapping
+	public ResponseEntity<?> findAll(@RequestHeader(name = "Authorization") String token) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+
+		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		List<Usuario> findAll = usuarioRepository.findAll();
+		findAll = findAll.stream().map(e-> {
+			e.setSenha("");
+			
+			return e;
+		}).collect(Collectors.toList());
+		
+		return ResponseEntity.ok().body(findAll);
+	}
+
 }

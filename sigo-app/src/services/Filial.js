@@ -22,6 +22,28 @@ export const addNewCompany = async (body) => {
 }
 
 
+export const editCompany = async (body) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+    };
+    return await Vue.prototype.$axios.put(`/api/v1/companies/${body.codigo}`,
+        body,
+        config).then(response => {
+
+            if (response.status == 200) {
+                return response;
+            }
+            return null;
+        }).catch(err => {
+            return null;
+        });
+
+}
+
+
+
 export const getCompanies = async () => {
     const config = {
         headers: {
@@ -55,6 +77,25 @@ export const companyExists = async (cnpj) => {
             return true;
         }).catch(err => {
             return true;
+        });
+
+}
+
+
+export const deleteCompany = async (id) => {
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+    };
+    return await Vue.prototype.$axios.delete(`/api/v1/companies/${id}`, config).then(response => {
+            if (response.status == 204) {
+                return response;
+            }
+            return null;
+        }).catch(err => {
+            return null;
         });
 
 }
