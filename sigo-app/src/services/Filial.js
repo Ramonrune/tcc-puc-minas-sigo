@@ -51,13 +51,13 @@ export const getCompanies = async () => {
         },
     };
     return await Vue.prototype.$axios.get(`/api/v1/companies`, config).then(response => {
-            if (response.status == 200) {
-                return response.data;
-            }
-            return [];
-        }).catch(err => {
-            return [];
-        });
+        if (response.status == 200) {
+            return response.data;
+        }
+        return [];
+    }).catch(err => {
+        return [];
+    });
 
 }
 
@@ -71,13 +71,13 @@ export const companyExists = async (cnpj) => {
         },
     };
     return await Vue.prototype.$axios.get(`/api/v1/companies/exists/${cnpj}`, config).then(response => {
-            if (response.status == 200) {
-                return false;
-            }
-            return true;
-        }).catch(err => {
-            return true;
-        });
+        if (response.status == 200) {
+            return false;
+        }
+        return true;
+    }).catch(err => {
+        return true;
+    });
 
 }
 
@@ -90,12 +90,20 @@ export const deleteCompany = async (id) => {
         },
     };
     return await Vue.prototype.$axios.delete(`/api/v1/companies/${id}`, config).then(response => {
-            if (response.status == 204) {
-                return response;
-            }
-            return null;
-        }).catch(err => {
-            return null;
-        });
+        if (response == undefined) {
+            return  { status: 409 };
+        }
+        if (response.status == 204) {
+            return response;
+        }
+        return null;
+    }).catch(err => {
+        console.log('aquiii')
+        console.log(err);
+        if (err.response) {
+            return err.response;
+        }
+        return null;
+    });
 
 }

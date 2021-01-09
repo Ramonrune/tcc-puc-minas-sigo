@@ -18,8 +18,8 @@ CREATE TABLE usuario_filial(
 	codigo_usuario BIGINT(20) NOT NULL,
     codigo_filial BIGINT(20) NOT NULL,
     PRIMARY KEY (codigo_usuario, codigo_filial),
-    FOREIGN KEY (codigo_usuario) REFERENCES usuario(codigo),
-    FOREIGN KEY (codigo_filial) REFERENCES filial(codigo)
+    FOREIGN KEY (codigo_usuario) REFERENCES usuario(codigo) ON DELETE CASCADE,
+    FOREIGN KEY (codigo_filial) REFERENCES filial(codigo) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

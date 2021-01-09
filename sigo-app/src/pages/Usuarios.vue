@@ -22,7 +22,7 @@
         <tr>
           <th class="text-left">Nome</th>
           <th class="text-left">Email</th>
-          <th class="text-left">Permissões</th>
+          <th class="text-left">Permissão</th>
           <th class="text-left">Filiais com acesso</th>
           <th class="text-left">Ações</th>
         </tr>
@@ -80,10 +80,12 @@
               v-model="newUser.email"
               label="Email"
               class="col-12"
+              :disable="mode == 'ADD' ? false : true"
             />
             <q-input
               filled
               v-model="newUser.senha"
+              type="password"
               label="Senha"
               class="col-6"
             />
@@ -91,14 +93,27 @@
             <q-input
               filled
               v-model="newUser.confirmarSenha"
+              type="password"
               label="Confirmar senha"
               class="col-6"
+            />
+
+            <q-select
+              filled
+              v-model="selectedPermission"
+              :options="permissionsList"
+              option-value="codigo"
+              option-label="descricao"
+              emit-value
+              map-options
+              label="Permissão"
+              class="col-12"
             />
 
             <div class="row col-12">
               <q-select
                 filled
-                v-model="newUser.filiais"
+                v-model="selectedCompany"
                 :options="companiesList"
                 option-value="codigo"
                 option-label="nome"
@@ -113,9 +128,41 @@
                 label="Adicionar filial"
                 dense
                 class="col-4"
-                style="height: 55px;"
+                style="height: 55px"
+                @click="addFilial"
               />
             </div>
+
+            <q-markup-table style="width: 100%">
+              <thead>
+                <tr>
+                  <th class="text-left">Nome</th>
+                  <th class="text-left">CNPJ</th>
+                  <th class="text-left">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="company in newUser.filiais" :key="company.codigo">
+                  <td class="text-left">{{ company.nome }}</td>
+                  <td class="text-left">
+                    {{
+                      company.cnpj.replace(
+                        /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+                        "$1.$2.$3/$4-$5"
+                      )
+                    }}
+                  </td>
+                  <td class="text-left">
+                    <q-btn
+                      color="red"
+                      label="Remover"
+                      dense
+                      @click="removeFilial(company.codigo)"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </q-markup-table>
           </div>
         </q-card-section>
 
@@ -138,12 +185,12 @@
     <q-dialog v-model="showUserRemoveWindow" persistent>
       <q-card>
         <q-card-section class="row items-center">
-          <span class="text-bold text-h5">Excluir filial</span>
+          <span class="text-bold text-h5">Excluir usuário</span>
         </q-card-section>
 
         <q-card-section v-if="userToExclude != null">
           <div>
-            Tem certeza que deseja excluir a filial
+            Tem certeza que deseja excluir o usuário
             {{ userToExclude.nome }} ?
           </div>
         </q-card-section>
@@ -173,6 +220,7 @@ import {
 } from "../services/Usuario";
 
 import { getCompanies } from "../services/Filial";
+import { getPermissoes } from "../services/Permissao";
 
 export default {
   name: "Usuarios",
@@ -181,6 +229,7 @@ export default {
     return {
       userList: [],
       companiesList: [],
+      permissionsList: [],
       showUserWindow: false,
       showUserRemoveWindow: false,
       userToExclude: null,
@@ -194,6 +243,8 @@ export default {
         permissoes: [],
         filiais: [],
       },
+      selectedCompany: null,
+      selectedPermission: null,
     };
   },
 
@@ -201,6 +252,43 @@ export default {
     await this.refreshList();
   },
   methods: {
+    removeFilial(codigo) {
+      this.newUser.filiais.splice(
+        this.newUser.filiais.findIndex((e) => e.codigo == codigo),
+        1
+      );
+    },
+    addFilial() {
+      if (this.selectedCompany == null) {
+        this.$q.notify({
+          color: "positive",
+          message: "Selecione uma filial!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      }
+
+      let newCompany = this.companiesList.filter(
+        (e) => e.codigo == this.selectedCompany
+      )[0];
+
+      let filiais = this.newUser.filiais;
+      let size = filiais.filter((e) => e.codigo == newCompany.codigo).length;
+      console.log(size);
+      if (size > 0) {
+        this.$q.notify({
+          color: "positive",
+          message: "Filial já adicionada na tabela!",
+          position: "top",
+          timeout: 1000,
+        });
+      } else {
+        this.newUser.filiais.push(newCompany);
+        this.selectedCompany = null;
+      }
+    },
+
     resetForm() {
       this.newUser = {
         nome: "",
@@ -210,6 +298,9 @@ export default {
         filiais: [],
         permissoes: [],
       };
+
+      this.selectedCompany = null;
+      this.selectedPermission = null;
     },
     showEdit(company) {
       this.mode = "EDIT";
@@ -254,11 +345,11 @@ export default {
     },
     async refreshList() {
       this.userList = await getUsers();
-      console.log(this.userList);
       this.companiesList = await getCompanies();
+      this.permissionsList = await getPermissoes();
     },
     async emailExists(email) {
-      return await this.emailExists(email);
+      return await userExists(email);
     },
 
     async validate() {
@@ -327,11 +418,43 @@ export default {
         return;
       }
 
+      if (this.mode == "ADD") {
+        if (this.selectedPermission == null) {
+          this.$q.notify({
+            color: "negative",
+            message: "Selecione uma permissão!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
+      }
+
+      if(this.newUser.filiais.length == 0){
+          this.$q.notify({
+            color: "negative",
+            message: "Adicione pelo menos uma filial!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+      }
+
+      this.newUser.permissoes = [];
+      let newPermission = this.permissionsList.filter(
+        (e) => e.codigo == this.selectedPermission
+      )[0];
+      this.newUser.permissoes.push(newPermission);
+
       let body = {
         nome: this.newUser.nome,
         email: this.newUser.email,
         senha: this.newUser.senha,
+        filiais: this.newUser.filiais,
+        permissoes: this.newUser.permissoes,
       };
+
+      console.log(body);
 
       if (this.mode == "ADD") {
         let response = await addNewUser(body);

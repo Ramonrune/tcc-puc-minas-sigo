@@ -91,6 +91,10 @@ export const userExists = async (email) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
+
+    email = btoa(email);
+
+    console.log(`/api/v1/users/exists/${email}`);
     return await Vue.prototype.$axios.get(`/api/v1/users/exists/${email}`, config).then(response => {
             if (response.status == 200) {
                 return false;

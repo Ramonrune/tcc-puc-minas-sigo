@@ -1,7 +1,7 @@
 package com.sigo.api.resource;
 
+import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -44,6 +44,8 @@ public class UsuarioResource {
 		String password = new BCryptPasswordEncoder().encode(usuario.getSenha());
 		usuario.setSenha(password);
 
+		usuario.setCodigo(usuarioRepository.getMaxTransactionId().longValue() + 1);
+		
 		usuarioRepository.save(usuario);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
@@ -99,9 +101,12 @@ public class UsuarioResource {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		
-		Optional<Usuario> findByEmail = usuarioRepository.findByEmail(email);
+		email = new String(Base64.getDecoder().decode(email));
+		System.out.println(email);
+		List<Usuario> findByEmail = usuarioRepository.findByEmail(email);
+		System.out.println(findByEmail.size());
 		
-		return findByEmail.isPresent() ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+		return findByEmail.isEmpty() ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
 	}
 
 	

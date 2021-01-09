@@ -34,7 +34,7 @@ public class FilialResource {
 		Filial filial = filialRepository.findOne(codigo);
 		return filial != null ? ResponseEntity.ok(filial) : ResponseEntity.notFound().build();
 	}
-	
+
 	@PostMapping
 	public ResponseEntity<?> find(@RequestHeader(name = "Authorization") String token, @RequestBody Filial filial) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
@@ -42,16 +42,17 @@ public class FilialResource {
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		
+
 		filial.setCodigo(filialRepository.getMaxTransactionId().longValue() + 1);
 		filialRepository.save(filial);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(filial);
-		
+
 	}
-	
+
 	@PutMapping("/{codigo}")
-	public ResponseEntity<?> edit(@PathVariable Long codigo, @Valid @RequestBody Filial filial, @RequestHeader(name = "Authorization") String token) {
+	public ResponseEntity<?> edit(@PathVariable Long codigo, @Valid @RequestBody Filial filial,
+			@RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
@@ -63,7 +64,7 @@ public class FilialResource {
 		return ResponseEntity.status(HttpStatus.OK).body(newFilial);
 
 	}
-	
+
 	@GetMapping("exists/{cnpj}")
 	public ResponseEntity<?> find(@RequestHeader(name = "Authorization") String token, @PathVariable String cnpj) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
@@ -71,12 +72,11 @@ public class FilialResource {
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		
+
 		List<Filial> findByCnpj = filialRepository.findByCnpj(cnpj);
-		
+
 		return findByCnpj.isEmpty() ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
 	}
-
 
 	@GetMapping
 	public ResponseEntity<?> findAll(@RequestHeader(name = "Authorization") String token) {
@@ -85,13 +85,12 @@ public class FilialResource {
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		
+
 		List<Filial> filiais = filialRepository.findAll();
 		return ResponseEntity.ok(filiais);
 
 	}
-	
-	
+
 	@DeleteMapping("/{codigo}")
 	public ResponseEntity<?> remove(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
@@ -100,8 +99,13 @@ public class FilialResource {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 
-		filialRepository.delete(codigo);
+		try {
 
+			filialRepository.delete(codigo);
+		} catch (Exception ex) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+
+		}
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}

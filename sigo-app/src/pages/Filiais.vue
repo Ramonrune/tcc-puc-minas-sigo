@@ -203,7 +203,7 @@ import {
   editCompany,
   getCompanies,
   companyExists,
-  deleteCompany
+  deleteCompany,
 } from "../services/Filial";
 
 export default {
@@ -287,8 +287,14 @@ export default {
       this.newCompany.estado = this.stateOptions.filter(
         (e) => e.value == cloneCompany.estado
       )[0];
-      this.newCompany.telefone =  cloneCompany.telefone.replace(/^(\d{2})(\d{4})(\d{4})/, "($1) $2-$3");
-      this.newCompany.cep =  cloneCompany.cep.replace(/^(\d{5})(\d{3})/, "$1-$2");
+      this.newCompany.telefone = cloneCompany.telefone.replace(
+        /^(\d{2})(\d{4})(\d{4})/,
+        "($1) $2-$3"
+      );
+      this.newCompany.cep = cloneCompany.cep.replace(
+        /^(\d{5})(\d{3})/,
+        "$1-$2"
+      );
 
       console.log(this.newCompany);
       this.showCompanyWindow = true;
@@ -308,6 +314,17 @@ export default {
         });
         return;
       } else {
+        if (response.status == 409) {
+          this.$q.notify({
+            color: "negative",
+            message:
+              "Essa filial está vinculada a um usuário!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
+
         this.$q.notify({
           color: "negative",
           message:
