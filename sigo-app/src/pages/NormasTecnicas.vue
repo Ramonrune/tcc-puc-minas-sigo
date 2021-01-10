@@ -66,8 +66,16 @@
           </td>
           <td class="text-left">{{ standard.categoria }}</td>
           <td class="text-left q-gutter-xs">
-            <q-btn color="primary" label="Visualizar" dense />
             <q-btn color="teal" label="Download" dense />
+            <q-btn
+              color="red"
+              label="Excluir"
+              dense
+              @click="
+                normaToExclude = standard;
+                showNormaRemoveWindow = true;
+              "
+            />
           </td>
         </tr>
       </tbody>
@@ -114,7 +122,7 @@
               mask="####"
               v-model="newStandard.versao"
               label="Versão (ano da publicação)"
-              class="col-6"
+              class="col-3"
             />
 
             <q-input
@@ -122,7 +130,7 @@
               type="number"
               v-model="newStandard.numeroEdicao"
               label="Número edição"
-              class="col-6"
+              class="col-3"
             />
 
             <q-input
@@ -130,15 +138,15 @@
               mask="##/##/####"
               v-model="newStandard.dataEdicao"
               label="Data edição"
-              class="col-6"
+              class="col-3"
             />
 
             <q-input
               filled
               mask="##/##/####"
               v-model="newStandard.inicioValidade"
-              label="Data de início de validade"
-              class="col-6"
+              label="Início de validade"
+              class="col-3"
             />
 
             <q-input
@@ -151,7 +159,7 @@
 
             <q-file filled bottom-slots v-model="file" label="Arquivo" counter>
               <template v-slot:prepend>
-                <q-icon name="cloud_upload"/>
+                <q-icon name="cloud_upload" />
               </template>
 
               <template v-slot:hint>Arquivo da Norma</template>
@@ -174,12 +182,12 @@
     <q-dialog v-model="showNormaRemoveWindow" persistent>
       <q-card>
         <q-card-section class="row items-center">
-          <span class="text-bold text-h5">Excluir filial</span>
+          <span class="text-bold text-h5">Excluir norma</span>
         </q-card-section>
 
         <q-card-section v-if="normaToExclude != null">
           <div>
-            Tem certeza que deseja excluir a filial
+            Tem certeza que deseja excluir a norma
             {{ normaToExclude.titulo }} ?
           </div>
         </q-card-section>
@@ -191,18 +199,49 @@
             v-close-popup
             @click="normaToExclude = null"
           />
-          <q-btn label="Sim" color="primary" />
+          <q-btn label="Sim" color="primary" @click="removeStandard" />
         </q-card-actions>
       </q-card>
     </q-dialog>
   </div>
 </template>
 <script>
-import { getStandards } from "../services/Norma";
+import {
+  addNewStandard,
+  getStandards,
+  uploadStandard,
+  deleteStandard
+} from "../services/Norma";
+
+import Moment from "moment";
 
 export default {
   name: "NormasTecnicas",
   methods: {
+    async removeStandard() {
+      let response = await deleteStandard(this.normaToExclude.codigo);
+      this.normaToExclude = null;
+      this.showNormaRemoveWindow = false;
+
+      if (response != null && response.status == 204) {
+        await this.refreshList();
+        this.$q.notify({
+          color: "positive",
+          message: "Norma excluida com sucesso!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      } else {
+        this.$q.notify({
+          color: "negative",
+          message:
+            "Ocorreu um problema ao remover a norma, tente novamente mais tarde!",
+          position: "top",
+          timeout: 1000,
+        });
+      }
+    },
     resetForm() {
       this.newStandard = {
         orgao: "",
@@ -216,7 +255,7 @@ export default {
         categoria: "",
       };
     },
-    validate() {
+    async validate() {
       if (this.newStandard.orgao.trim() == "") {
         this.$q.notify({
           color: "negative",
@@ -277,7 +316,7 @@ export default {
         return;
       }
 
-      if (this.newStandard.dataEdicao.match(/\d/g).join("").length != 8) {
+      if (this.newStandard.dataEdicao.length != 10) {
         this.$q.notify({
           color: "negative",
           message: "Data da edição inválida!",
@@ -287,7 +326,7 @@ export default {
         return;
       }
 
-      if (this.newStandard.inicioValidade.match(/\d/g).join("").length != 8) {
+      if (this.newStandard.inicioValidade.length != 10) {
         this.$q.notify({
           color: "negative",
           message: "Data de início de validade inválida!",
@@ -306,6 +345,72 @@ export default {
         });
         return;
       }
+
+      if (this.file == null) {
+        this.$q.notify({
+          color: "negative",
+          message: "Selecione um documento!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      }
+
+      let dataEdicao = Moment(this.newStandard.dataEdicao, "DD/MM/YYYY").format(
+        "YYYY-MM-DD"
+      );
+      let inicioValidade = Moment(
+        this.newStandard.inicioValidade,
+        "DD/MM/YYYY"
+      ).format("YYYY-MM-DD");
+
+      let body = { ...this.newStandard };
+
+      body.dataEdicao = dataEdicao;
+      body.inicioValidade = inicioValidade;
+
+      console.log(body);
+      let response = await addNewStandard(body);
+      console.log(response);
+
+      if (response == null || response.status != 201) {
+        this.$q.notify({
+          color: "negative",
+          message:
+            "Ocorreu um problema ao tentar adicionar uma nova norma, por favor tente novamente mais tarde!",
+          position: "top",
+          timeout: 1000,
+        });
+
+        return;
+      }
+
+      let responseUpload = await uploadStandard(this.file);
+      console.log(responseUpload);
+
+      if (responseUpload == null || responseUpload.status != 200) {
+        this.$q.notify({
+          color: "negative",
+          message:
+            "Ocorreu um problema ao tentar adicionar uma nova norma, por favor tente novamente mais tarde!",
+          position: "top",
+          timeout: 1000,
+        });
+
+        return;
+      }
+
+      this.showAddNormaWindow = false;
+      this.resetForm();
+      this.refreshList();
+
+      this.$q.notify({
+        color: "positive",
+        message: "Norma adicionada com sucesso!",
+        position: "top",
+        timeout: 1000,
+      });
+      return;
     },
     doSearch() {
       if (this.searchText == "") {
@@ -321,10 +426,13 @@ export default {
           e.versao.toLowerCase().includes(this.searchText)
       );
     },
+    async refreshList() {
+      this.standardList = await getStandards();
+      this.standardListSearch = this.standardList;
+    },
   },
   async mounted() {
-    this.standardList = await getStandards();
-    this.standardListSearch = this.standardList;
+    this.refreshList();
   },
   data() {
     return {
@@ -346,7 +454,7 @@ export default {
       showAddNormaWindow: false,
       showNormaRemoveWindow: false,
       normaToExclude: null,
-      file: null
+      file: null,
     };
   },
 };

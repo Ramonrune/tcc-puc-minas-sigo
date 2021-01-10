@@ -1,5 +1,9 @@
 package com.sigo.api.resource;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +25,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.sigo.api.dto.NormaModificacaoDTO;
 import com.sigo.api.dto.NormaModificacoesDTO;
@@ -37,15 +44,32 @@ public class NormaResource {
 
 	@Autowired
 	private NormaRepository normaRepository;
-
-	@PostMapping
-	public ResponseEntity<?> save(@Valid @RequestBody Norma norma,
-			@RequestHeader(name = "Authorization") String token) {
+	
+	@PostMapping("/upload")
+	public ResponseEntity<?> handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile, @RequestHeader(name = "Authorization") String token) throws IOException {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
+		
+		saveUploadedFiles(uploadfile);
+		
+		return ResponseEntity.status(HttpStatus.OK).build();
+
+	}
+
+	@PostMapping
+	public ResponseEntity<?> save(@Valid @RequestBody Norma norma,
+			@RequestHeader(name = "Authorization") String token) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+		
+		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		Long maxTransactionId = normaRepository.getMaxTransactionId();
+		norma.setCodigo(maxTransactionId + 1);
 
 		normaRepository.save(norma);
 
@@ -111,6 +135,27 @@ public class NormaResource {
 		normaModificacoesDTO.setList(list);
 
 		return !list.isEmpty() ? ResponseEntity.ok(normaModificacoesDTO) : ResponseEntity.notFound().build();
+	}
+	
+	@DeleteMapping("/{codigo}")
+	public ResponseEntity<?> remove(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+
+		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		normaRepository.delete(codigo);
+
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+	}
+	
+	private String saveUploadedFiles(final MultipartFile file) throws IOException {
+		final byte[] bytes = file.getBytes();
+		final Path path = Paths.get("C:\\Users\\Computador\\Desktop\\sigo-app\\" + file.getOriginalFilename());
+		Files.write(path, bytes);
+		return "";
 	}
 
 }
