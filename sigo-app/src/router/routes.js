@@ -2,6 +2,7 @@
 const routes = [
   {
     path: '/',
+    name: 'login',
     component: () => import('layouts/LoginLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Login.vue') },
@@ -11,6 +12,18 @@ const routes = [
   {
     path: '/sigo',
     component: () => import('layouts/MainLayout.vue'),
+    beforeEnter(to, from, next) {
+      let token = localStorage.getItem("TOKEN");
+
+      if (token == "null" || token == null) {
+        next({name: 'login'});
+        window.location.href = "#/";
+
+      }
+      else{
+        next();
+      }
+    },
     children: [
       { path: '', component: () => import('pages/Index.vue') },
       { path: 'normas', component: () => import('pages/NormasTecnicas.vue') },
@@ -31,7 +44,7 @@ const routes = [
   {
     path: '*',
     component: () => import('pages/Error404.vue')
-  
+
   }
 ]
 

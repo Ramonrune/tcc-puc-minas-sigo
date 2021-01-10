@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+</head>
+<body style="font-family: Arial; font-size: 14px;">
+
+	<p>Olá!</p>
+	<p>Existem algumas normas técnicas que tiveram modificações. Veja:</p>
+
+	<p>
+	<table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+
+		<thead>
+			<tr>
+				<th>Orgão</th>
+				<th>Título</th>
+				<th>Versão</th>
+				<th>Início validade</th>
+				<th>Categoria</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr
+				style="border-bottom: 1px solid #ccc; border-top: 1px solid #ccc;"
+				th:each="normaModificacaoDTO: ${modificacoes}">
+				<td th:text="${normaModificacaoDTO.norma.orgao}" style="text-align: center">Orgão</td>
+				<td th:text="${normaModificacaoDTO.norma.titulo}" style="text-align: center">Título</td>
+				<td th:text="${normaModificacaoDTO.norma.versao}" style="text-align: center">Versão</td>
+				<td
+					th:text="${#temporals.format(normaModificacaoDTO.norma.inicioValidade, 'dd/MM/yyyy')}" style="text-align: center">Início
+					validade</td>
+				<td th:text="${normaModificacaoDTO.norma.categoria}" style="text-align: center">Categoria</td>
+
+			</tr>
+
+		</tbody>
+
+	</table>
+
+
+	</p>
+
+	<p>Obrigado.</p>
+
+	<p>Equipe Sigo!</p>
+</body>
+</html>
