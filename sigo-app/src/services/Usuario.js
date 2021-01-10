@@ -124,3 +124,15 @@ export const deleteUser = async (id) => {
         });
 
 }
+
+
+
+export const isMyUserAdmin = () => {
+    let userData = JSON.parse(localStorage.getItem("USER_DATA"));
+    let hasAdmin =
+      userData.permissoes.filter((e) => e.descricao == "ROLE_ADMIN").length > 0
+        ? true
+        : false;
+
+    return hasAdmin;
+}

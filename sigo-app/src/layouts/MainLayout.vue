@@ -71,10 +71,11 @@
           <q-item
             class="GNL__drawer-item"
             v-ripple
+            clickable
             v-for="link in links1"
             :key="link.text"
-            clickable
             :to="link.to"
+            v-if="showItemLink01(link)"
             style="text-decoration: none"
           >
             <q-item-section avatar>
@@ -196,10 +197,20 @@ export default {
       byWebsite: "",
       byDate: "Any time",
       links1: [
-        { icon: "web", text: "Painel", to: "/sigo" },
-        { icon: "person", text: "Usuários", to: "/sigo/usuarios" },
-        { icon: "domain", text: "Filiais", to: "/sigo/filiais" },
-        { icon: "bar_chart", text: "Relatórios", to: "/sigo/relatorios" },
+        { id: "home", icon: "web", text: "Painel", to: "/sigo" },
+        { id: "users", icon: "person", text: "Usuários", to: "/sigo/usuarios" },
+        {
+          id: "companies",
+          icon: "domain",
+          text: "Filiais",
+          to: "/sigo/filiais",
+        },
+        {
+          id: "reports",
+          icon: "bar_chart",
+          text: "Relatórios",
+          to: "/sigo/relatorios",
+        },
       ],
       links2: [
         { icon: "view_list", text: "Processos", to: "/sigo/processos" },
@@ -216,8 +227,29 @@ export default {
     };
   },
   methods: {
+    showItemLink01(item) {
+      let userData = JSON.parse(localStorage.getItem("USER_DATA"));
+      let hasAdmin =
+        userData.permissoes.filter((e) => e.descricao == "ROLE_ADMIN").length >
+        0
+          ? true
+          : false;
+
+      console.log(hasAdmin);
+      if (hasAdmin == false) {
+        if (item.id == "users") {
+          return false;
+        }
+
+        if (item.id == "companies") {
+          return false;
+        }
+      }
+
+      return true;
+    },
     async loggout() {
-     /* let response = await this.$axios.delete ('/tokens/revoke',
+      /* let response = await this.$axios.delete ('/tokens/revoke',
       {
         headers: {
           Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),

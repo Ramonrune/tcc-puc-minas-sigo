@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sigo.api.model.JsonWebToken;
 import com.sigo.api.model.Usuario;
 import com.sigo.api.repository.UsuarioRepository;
@@ -45,22 +47,32 @@ public class UsuarioResource {
 		usuario.setSenha(password);
 
 		usuario.setCodigo(usuarioRepository.getMaxTransactionId().longValue() + 1);
-		
+
 		usuarioRepository.save(usuario);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
 	}
-	
+
 	@PutMapping("/{codigo}")
-	public ResponseEntity<?> edit(@PathVariable Long codigo, @Valid @RequestBody Usuario usuario, @RequestHeader(name = "Authorization") String token) {
+	public ResponseEntity<?> edit(@PathVariable Long codigo, @Valid @RequestBody Usuario usuario,
+			@RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			String json = mapper.writeValueAsString(usuario);
+			System.out.println("ResultingJSONstring = " + json);
+			// System.out.println(json);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+
 		Usuario user = usuarioRepository.findOne(codigo);
-		if(user != null) {
+		if (user != null) {
 			usuario.setSenha(user.getSenha());
 		}
 		Usuario newUsuario = usuarioRepository.save(usuario);
@@ -92,7 +104,7 @@ public class UsuarioResource {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}
-	
+
 	@GetMapping("exists/{email}")
 	public ResponseEntity<?> find(@RequestHeader(name = "Authorization") String token, @PathVariable String email) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
@@ -100,16 +112,15 @@ public class UsuarioResource {
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		
+
 		email = new String(Base64.getDecoder().decode(email));
 		System.out.println(email);
 		List<Usuario> findByEmail = usuarioRepository.findByEmail(email);
 		System.out.println(findByEmail.size());
-		
+
 		return findByEmail.isEmpty() ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
 	}
 
-	
 	@GetMapping
 	public ResponseEntity<?> findAll(@RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
@@ -117,14 +128,14 @@ public class UsuarioResource {
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		
+
 		List<Usuario> findAll = usuarioRepository.findAll();
-		findAll = findAll.stream().map(e-> {
+		findAll = findAll.stream().map(e -> {
 			e.setSenha("");
-			
+
 			return e;
 		}).collect(Collectors.toList());
-		
+
 		return ResponseEntity.ok().body(findAll);
 	}
 

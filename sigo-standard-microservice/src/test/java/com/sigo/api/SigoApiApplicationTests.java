@@ -2,21 +2,6 @@ package com.sigo.api;
 
 import java.io.IOException;
 
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,11 +9,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = SigoApiApplication.class)
-public class AlgamoneyApiApplicationTests {
+public class SigoApiApplicationTests {
 
 	@Test
 	public void contextLoads() throws IOException {
-
+/*
 		String username = "***REMOVED***";
 		String password = "***REMOVED***";
 		String host = "***REMOVED***";
@@ -43,6 +28,9 @@ public class AlgamoneyApiApplicationTests {
 		           .setHttpClientConfigCallback(httpAsyncClientBuilder -> 
 		    httpAsyncClientBuilder.setDefaultCredentialsProvider(credentialsProvider)
 		                       .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())));
+		
+		
+		*/
 		/*
 		 * 
 		 * CREATEEE
@@ -75,7 +63,7 @@ public class AlgamoneyApiApplicationTests {
 		GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
 		String message = getResponse.getSourceAsString(); 
 		System.out.println(message);
-		*/
+		
 		
 		
 		System.out.println("hereeeeeeeee");
@@ -99,6 +87,8 @@ public class AlgamoneyApiApplicationTests {
 		}
 		
 		client.close();
+		
+		*/
 
 	}
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md" v-if="render">
     <q-toolbar-title shrink class="row items-center no-wrap">
       <span class="q-ml-sm" style="font-weight: 500; margin: 0">Usuários</span>
     </q-toolbar-title>
@@ -88,6 +88,7 @@
               type="password"
               label="Senha"
               class="col-6"
+              :disable="mode == 'ADD' ? false : true"
             />
 
             <q-input
@@ -96,6 +97,7 @@
               type="password"
               label="Confirmar senha"
               class="col-6"
+              :disable="mode == 'ADD' ? false : true"
             />
 
             <q-select
@@ -217,6 +219,7 @@ import {
   getUsers,
   userExists,
   deleteUser,
+  isMyUserAdmin,
 } from "../services/Usuario";
 
 import { getCompanies } from "../services/Filial";
@@ -227,6 +230,7 @@ export default {
 
   data() {
     return {
+      render: false,
       userList: [],
       companiesList: [],
       permissionsList: [],
@@ -248,6 +252,13 @@ export default {
     };
   },
 
+  beforeMount() {
+    if (!isMyUserAdmin()) {
+      window.location.href = "#/sigo/403";
+      return;
+    }
+    this.render = true;
+  },
   async mounted() {
     await this.refreshList();
   },
@@ -302,21 +313,16 @@ export default {
       this.selectedCompany = null;
       this.selectedPermission = null;
     },
-    showEdit(company) {
+    showEdit(user) {
       this.mode = "EDIT";
-      const cloneCompany = { ...company };
+      const cloneUser = JSON.parse(JSON.stringify(user));
 
-      this.newUser = cloneCompany;
-      this.newUser.estado = this.stateOptions.filter(
-        (e) => e.value == cloneCompany.estado
-      )[0];
-      this.newUser.telefone = cloneCompany.telefone.replace(
-        /^(\d{2})(\d{4})(\d{4})/,
-        "($1) $2-$3"
-      );
-      this.newUser.cep = cloneCompany.cep.replace(/^(\d{5})(\d{3})/, "$1-$2");
+      this.newUser = cloneUser;
+
+      this.selectedPermission = cloneUser.permissoes[0];
 
       console.log(this.newUser);
+
       this.showUserWindow = true;
     },
     async removeUser() {
@@ -386,43 +392,31 @@ export default {
           });
           return;
         }
-      }
 
-      if (this.newUser.senha == "") {
-        this.$q.notify({
-          color: "negative",
-          message: "Senha não pode ser vazia!",
-          position: "top",
-          timeout: 1000,
-        });
-        return;
-      }
-
-      if (this.newUser.confirmarSenha == "") {
-        this.$q.notify({
-          color: "negative",
-          message: "Confirmação de senha não pode ser vazia!",
-          position: "top",
-          timeout: 1000,
-        });
-        return;
-      }
-
-      if (this.newUser.senha != this.newUser.confirmarSenha) {
-        this.$q.notify({
-          color: "negative",
-          message: "As senhas informadas não são iguais!",
-          position: "top",
-          timeout: 1000,
-        });
-        return;
-      }
-
-      if (this.mode == "ADD") {
-        if (this.selectedPermission == null) {
+        if (this.newUser.senha == "") {
           this.$q.notify({
             color: "negative",
-            message: "Selecione uma permissão!",
+            message: "Senha não pode ser vazia!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
+
+        if (this.newUser.confirmarSenha == "") {
+          this.$q.notify({
+            color: "negative",
+            message: "Confirmação de senha não pode ser vazia!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
+
+        if (this.newUser.senha != this.newUser.confirmarSenha) {
+          this.$q.notify({
+            color: "negative",
+            message: "As senhas informadas não são iguais!",
             position: "top",
             timeout: 1000,
           });
@@ -430,21 +424,30 @@ export default {
         }
       }
 
-      if(this.newUser.filiais.length == 0){
-          this.$q.notify({
-            color: "negative",
-            message: "Adicione pelo menos uma filial!",
-            position: "top",
-            timeout: 1000,
-          });
-          return;
+      if (this.selectedPermission == null) {
+        this.$q.notify({
+          color: "negative",
+          message: "Selecione uma permissão!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      }
+
+      if (this.newUser.filiais.length == 0) {
+        this.$q.notify({
+          color: "negative",
+          message: "Adicione pelo menos uma filial!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
       }
 
       this.newUser.permissoes = [];
-      let newPermission = this.permissionsList.filter(
+      this.newUser.permissoes = this.permissionsList.filter(
         (e) => e.codigo == this.selectedPermission
-      )[0];
-      this.newUser.permissoes.push(newPermission);
+      );
 
       let body = {
         nome: this.newUser.nome,

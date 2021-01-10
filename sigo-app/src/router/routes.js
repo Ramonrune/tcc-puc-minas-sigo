@@ -20,6 +20,8 @@ const routes = [
       { path: 'relatorios', component: () => import('pages/Relatorios.vue') },
       { path: 'filiais', component: () => import('pages/Filiais.vue') },
       { path: 'usuarios', component: () => import('pages/Usuarios.vue') },
+      { path: '403', component: () => import('pages/Error403.vue') },
+
 
 
     ]
@@ -29,6 +31,7 @@ const routes = [
   {
     path: '*',
     component: () => import('pages/Error404.vue')
+  
   }
 ]
 

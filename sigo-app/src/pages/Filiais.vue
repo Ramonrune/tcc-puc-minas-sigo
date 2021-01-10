@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-md">
+  <div class="q-pa-md" v-if="render">
     <q-toolbar-title shrink class="row items-center no-wrap">
       <span class="q-ml-sm" style="font-weight: 500; margin: 0">Filiais</span>
     </q-toolbar-title>
@@ -206,11 +206,14 @@ import {
   deleteCompany,
 } from "../services/Filial";
 
+import {isMyUserAdmin} from '../services/Usuario';
+
 export default {
   name: "Filiais",
 
   data() {
     return {
+      render: false,
       companyList: [],
       showCompanyWindow: false,
       showCompanyRemoveWindow: false,
@@ -261,6 +264,14 @@ export default {
     };
   },
 
+  beforeMount() {
+    console.log(isMyUserAdmin() + " ------------------------")
+    if (!isMyUserAdmin()) {
+      window.location.href = "#/sigo/403";
+      return;
+    }
+    this.render = true;
+  },
   async mounted() {
     await this.refreshList();
   },
@@ -317,8 +328,7 @@ export default {
         if (response.status == 409) {
           this.$q.notify({
             color: "negative",
-            message:
-              "Essa filial está vinculada a um usuário!",
+            message: "Essa filial está vinculada a um usuário!",
             position: "top",
             timeout: 1000,
           });
