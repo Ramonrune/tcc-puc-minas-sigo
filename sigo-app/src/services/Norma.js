@@ -21,7 +21,7 @@ export const addNewStandard = async (body) => {
 }
 
 
-export const uploadStandard = async (file) => {
+export const uploadStandard = async (file, codigo) => {
     const config = {
         headers: {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
@@ -32,7 +32,7 @@ export const uploadStandard = async (file) => {
     let bodyFormData = new FormData();
     bodyFormData.append('file', file);
 
-    return await Vue.prototype.$axios.post(`/api/v1/standards/upload`,
+    return await Vue.prototype.$axios.post(`/api/v1/standards/upload/${codigo}`,
         bodyFormData,
         config).then(response => {
 
@@ -68,6 +68,36 @@ export const getStandards = async () => {
 
 
 
+export const getStandardPdf = async (standard) => {
+    const config = {
+        responseType: 'blob',
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+    };
+    return await Vue.prototype.$axios.get(`/api/v1/standards/pdf/${standard.codigo}`, config).then(response => {
+        const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
+
+        const link = document.createElement('a');
+
+        link.href = downloadUrl;
+
+        link.setAttribute('download', standard.titulo + ".pdf"); //any other extension
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+    }).catch(err => {
+        console.log(err);
+    });
+
+}
+
+
+
+
 
 export const deleteStandard = async (id) => {
 
@@ -82,7 +112,7 @@ export const deleteStandard = async (id) => {
         }
         return null;
     }).catch(err => {
-       
+
         if (err.response) {
             return err.response;
         }

@@ -1,9 +1,7 @@
 package com.sigo.api.resource;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,8 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,10 +30,12 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.google.common.io.ByteStreams;
 import com.sigo.api.dto.NormaModificacaoDTO;
 import com.sigo.api.dto.NormaModificacoesDTO;
 import com.sigo.api.dto.PageNormaDTO;
 import com.sigo.api.dto.TipoMudanca;
+import com.sigo.api.infra.S3;
 import com.sigo.api.model.JsonWebToken;
 import com.sigo.api.model.Norma;
 import com.sigo.api.repository.NormaRepository;
@@ -44,17 +47,19 @@ public class NormaResource {
 
 	@Autowired
 	private NormaRepository normaRepository;
-	
-	@PostMapping("/upload")
-	public ResponseEntity<?> handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile, @RequestHeader(name = "Authorization") String token) throws IOException {
+
+	@PostMapping("/upload/{codigo}")
+	public ResponseEntity<?> handleFileUpload(@RequestPart(value = "file") final MultipartFile uploadfile,
+			@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) throws IOException {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		
-		saveUploadedFiles(uploadfile);
-		
+
+		S3 s3 = new S3();
+		s3.save(uploadfile, codigo.toString());
+
 		return ResponseEntity.status(HttpStatus.OK).build();
 
 	}
@@ -63,17 +68,17 @@ public class NormaResource {
 	public ResponseEntity<?> save(@Valid @RequestBody Norma norma,
 			@RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
-		
+
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		
+
 		Long maxTransactionId = normaRepository.getMaxTransactionId();
 		norma.setCodigo(maxTransactionId + 1);
 
-		normaRepository.save(norma);
+		Norma novaNorma = normaRepository.save(norma);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(norma);
+		return ResponseEntity.status(HttpStatus.CREATED).body(novaNorma);
 	}
 
 	@GetMapping("/{codigo}")
@@ -81,6 +86,26 @@ public class NormaResource {
 		Norma norma = normaRepository.findOne(codigo);
 
 		return norma != null ? ResponseEntity.ok(norma) : ResponseEntity.notFound().build();
+	}
+
+	@GetMapping("/pdf/{codigo}")
+	public ResponseEntity<byte[]> findPdf(@PathVariable Long codigo) throws IOException {
+
+		S3 s3 = new S3();
+
+		InputStream inputStream = s3.get(codigo.toString());
+
+		byte[] contents = StreamUtils.copyToByteArray(inputStream);
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_PDF);
+		// Here you have to set the actual filename of your pdf
+		String filename = codigo.toString() + ".pdf";
+		headers.setContentDispositionFormData(filename, filename);
+		headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+		ResponseEntity<byte[]> response = new ResponseEntity<>(contents, headers, HttpStatus.OK);
+		return response;
+
 	}
 
 	@GetMapping
@@ -130,13 +155,13 @@ public class NormaResource {
 
 		List<NormaModificacaoDTO> list = new ArrayList<>();
 		list.add(normaModificacaoDTO);
-		
+
 		NormaModificacoesDTO normaModificacoesDTO = new NormaModificacoesDTO();
 		normaModificacoesDTO.setList(list);
 
 		return !list.isEmpty() ? ResponseEntity.ok(normaModificacoesDTO) : ResponseEntity.notFound().build();
 	}
-	
+
 	@DeleteMapping("/{codigo}")
 	public ResponseEntity<?> remove(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
@@ -146,16 +171,18 @@ public class NormaResource {
 		}
 
 		normaRepository.delete(codigo);
+		S3 s3 = new S3();
+		s3.remove(codigo.toString());
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}
-	
-	private String saveUploadedFiles(final MultipartFile file) throws IOException {
-		final byte[] bytes = file.getBytes();
-		final Path path = Paths.get("C:\\Users\\Computador\\Desktop\\sigo-app\\" + file.getOriginalFilename());
-		Files.write(path, bytes);
-		return "";
-	}
+
+	/*
+	 * private String saveUploadedFiles(final MultipartFile file) throws IOException
+	 * { final byte[] bytes = file.getBytes(); final Path path =
+	 * Paths.get("C:\\Users\\Computador\\Desktop\\sigo-app\\" +
+	 * file.getOriginalFilename()); Files.write(path, bytes); return ""; }
+	 */
 
 }

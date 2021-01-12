@@ -66,7 +66,12 @@
           </td>
           <td class="text-left">{{ standard.categoria }}</td>
           <td class="text-left q-gutter-xs">
-            <q-btn color="teal" label="Download" dense />
+            <q-btn
+              color="teal"
+              label="Download"
+              dense
+              @click="downloadStandard(standard)"
+            />
             <q-btn
               color="red"
               label="Excluir"
@@ -157,7 +162,15 @@
               class="col-12"
             />
 
-            <q-file filled bottom-slots v-model="file" label="Arquivo" counter>
+            <q-file
+              filled
+              bottom-slots
+              v-model="file"
+              label="Arquivo"
+              counter
+              :filter="checkFileType"
+              @rejected="onRejected"
+            >
               <template v-slot:prepend>
                 <q-icon name="cloud_upload" />
               </template>
@@ -206,11 +219,15 @@
   </div>
 </template>
 <script>
+
+import Vue from 'vue'
+
 import {
   addNewStandard,
   getStandards,
   uploadStandard,
-  deleteStandard
+  deleteStandard,
+  getStandardPdf
 } from "../services/Norma";
 
 import Moment from "moment";
@@ -218,6 +235,19 @@ import Moment from "moment";
 export default {
   name: "NormasTecnicas",
   methods: {
+    checkFileType(files) {
+      return files.filter((file) => file.type === "application/pdf");
+    },
+    onRejected(rejectedEntries) {
+      // Notify plugin needs to be installed
+      // https://quasar.dev/quasar-plugins/notify#Installation
+      this.$q.notify({
+        color: "negative",
+        message: `Tipo do arquivo deve ser PDF!`,
+        position: "top",
+        timeout: 1000,
+      });
+    },
     async removeStandard() {
       let response = await deleteStandard(this.normaToExclude.codigo);
       this.normaToExclude = null;
@@ -254,6 +284,7 @@ export default {
         inicioValidade: "",
         categoria: "",
       };
+      this.file = null;
     },
     async validate() {
       if (this.newStandard.orgao.trim() == "") {
@@ -385,7 +416,10 @@ export default {
         return;
       }
 
-      let responseUpload = await uploadStandard(this.file);
+      let responseUpload = await uploadStandard(
+        this.file,
+        response.data.codigo
+      );
       console.log(responseUpload);
 
       if (responseUpload == null || responseUpload.status != 200) {
@@ -430,10 +464,14 @@ export default {
       this.standardList = await getStandards();
       this.standardListSearch = this.standardList;
     },
+    downloadStandard(standard) {
+      getStandardPdf(standard);
+    },
   },
   async mounted() {
     this.refreshList();
   },
+
   data() {
     return {
       searchText: "",

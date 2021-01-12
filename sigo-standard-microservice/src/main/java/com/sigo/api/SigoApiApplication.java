@@ -20,7 +20,7 @@ public class SigoApiApplication {
 	public static <T> T getBean(Class<T> type) {
 		return APPLICATION_CONTEXT.getBean(type);
 	}
-	
+
 	@Bean
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();

@@ -11,6 +11,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = SigoApiApplication.class)
 public class SigoApiApplicationTests {
 
+	
+	@Test
+	public void testS3() {
+		
+	}
+	
 	@Test
 	public void contextLoads() throws IOException {
 /*
