@@ -10,7 +10,7 @@
 
     <div class="row q-col-gutter-xs">
       <q-input
-        class="col-10"
+        :class="admin == true ? 'col-10' : 'col-12'"
         filled
         @input="doSearch"
         v-model="searchText"
@@ -27,6 +27,7 @@
       </q-input>
 
       <q-btn
+        v-if="admin == true"
         class="col-2"
         color="primary"
         label="Nova norma"
@@ -73,6 +74,7 @@
               @click="downloadStandard(standard)"
             />
             <q-btn
+              v-if="admin == true"
               color="red"
               label="Excluir"
               dense
@@ -229,6 +231,8 @@ import {
   deleteStandard,
   getStandardPdf
 } from "../services/Norma";
+
+import {isMyUserAdmin} from '../services/Usuario';
 
 import Moment from "moment";
 
@@ -469,11 +473,13 @@ export default {
     },
   },
   async mounted() {
+    this.admin = isMyUserAdmin();
     this.refreshList();
   },
 
   data() {
     return {
+      admin: false,
       searchText: "",
       newStandard: {
         orgao: "",

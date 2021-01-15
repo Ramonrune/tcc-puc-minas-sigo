@@ -22,6 +22,9 @@ client.interceptors.response.use(
 			}
 		}
 
+		return Promise.reject(err);
+
+
 	});
 
 
