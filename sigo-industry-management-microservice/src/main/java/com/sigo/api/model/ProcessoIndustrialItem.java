@@ -22,7 +22,7 @@ public class ProcessoIndustrialItem {
 	private Long codigo;
 
 	@Column(name = "codigo_processo_industrial")
-	private String codigoProcessoIndustrial;
+	private Long codigoProcessoIndustrial;
 
 	private String nome;
 	private Integer status;
@@ -49,11 +49,11 @@ public class ProcessoIndustrialItem {
 		this.codigo = codigo;
 	}
 
-	public String getCodigoProcessoIndustrial() {
+	public Long getCodigoProcessoIndustrial() {
 		return codigoProcessoIndustrial;
 	}
 
-	public void setCodigoProcessoIndustrial(String codigoProcessoIndustrial) {
+	public void setCodigoProcessoIndustrial(Long codigoProcessoIndustrial) {
 		this.codigoProcessoIndustrial = codigoProcessoIndustrial;
 	}
 

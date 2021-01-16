@@ -30,7 +30,7 @@ INSERT INTO processo_industrial VALUES(1, 'Fabricação de tecidos de algodão',
     data_inicio DATETIME NOT NULL,
     data_fim DATETIME NOT NULL,
 	codigo_externo_processo_industrial_item VARCHAR(100) NOT NULL,
-	FOREIGN KEY (codigo_processo_industrial) REFERENCES processo_industrial(codigo) ON DELETE CASCADE,
+	FOREIGN KEY (codigo_processo_industrial) REFERENCES processo_industrial(codigo) ON DELETE CASCADE
  );
  
  INSERT INTO processo_industrial_item VALUES(1, 1, 'Armazenamento do algodão', 3, 'A matéria-prima chega à indústria em grandes fardos de até 190kg, a fim de facilitar a sua armazenagem.',
