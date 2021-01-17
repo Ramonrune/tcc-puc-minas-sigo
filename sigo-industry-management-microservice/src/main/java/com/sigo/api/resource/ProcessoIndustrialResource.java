@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,8 +50,8 @@ public class ProcessoIndustrialResource {
 
 	@GetMapping
 	public ResponseEntity<?> findAll(@RequestParam("codigo_filial") Long codigoFilial,
-			@RequestParam("data_inicio_planejamento") LocalDate dataInicioPlanejamento,
-			@RequestParam("data_fim_planejamento") LocalDate dataFimPlanejamento) {
+			@RequestParam("data_inicio_planejamento")  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicioPlanejamento,
+			@RequestParam("data_fim_planejamento") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFimPlanejamento) {
 
 		if (dataInicioPlanejamento == null || dataFimPlanejamento == null || codigoFilial == null) {
 			return ResponseEntity.badRequest().build();

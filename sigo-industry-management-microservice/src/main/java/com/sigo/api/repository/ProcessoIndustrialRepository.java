@@ -14,7 +14,7 @@ public interface ProcessoIndustrialRepository extends JpaRepository<ProcessoIndu
 	@Query(value = "SELECT max(codigo) FROM ProcessoIndustrial")
 	Long getMaxTransactionId();
 
-	@Query(value = "SELECT * FROM processo_industrial WHERE codigo_filial = :codigoFilial AND (data_inicio_planejamento >= :dataInicioPlanejamento AND dataFimPlanejamento <= :dataFimPlanejamento)", nativeQuery = true)
+	@Query(value = "SELECT * FROM processo_industrial WHERE codigo_filial = :codigoFilial AND (data_inicio_planejamento >= :dataInicioPlanejamento AND data_fim_planejamento <= :dataFimPlanejamento)", nativeQuery = true)
 	List<ProcessoIndustrial> findByCodigoFilialAndPeriodoData(@Param("codigoFilial") Long codigoFilial, @Param("dataInicioPlanejamento") LocalDate dataInicioPlanejamento, @Param("dataFimPlanejamento") LocalDate dataFimPlanejamento );
 
 }

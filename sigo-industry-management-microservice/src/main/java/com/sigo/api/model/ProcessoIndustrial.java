@@ -6,6 +6,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -13,6 +14,7 @@ import javax.persistence.Table;
 import org.hibernate.envers.Audited;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
@@ -45,9 +47,10 @@ public class ProcessoIndustrial {
 	private Long codigoFilial;
 
 	@Column(name = "codigo_externo")
-	private Long codigoExterno;
+	private String codigoExterno;
 
-	@OneToMany(mappedBy = "codigoProcessoIndustrial", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "codigoProcessoIndustrial", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<ProcessoIndustrialItem> items;
 
 	public Long getCodigo() {
@@ -114,11 +117,11 @@ public class ProcessoIndustrial {
 		this.codigoFilial = codigoFilial;
 	}
 
-	public Long getCodigoExterno() {
+	public String getCodigoExterno() {
 		return codigoExterno;
 	}
 
-	public void setCodigoExterno(Long codigoExterno) {
+	public void setCodigoExterno(String codigoExterno) {
 		this.codigoExterno = codigoExterno;
 	}
 

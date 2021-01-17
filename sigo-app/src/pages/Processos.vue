@@ -1,7 +1,7 @@
 <template>
   <div class="q-pa-md">
     <q-toolbar-title shrink class="row items-center no-wrap">
-      <span class="q-ml-sm" style="font-weight: 500; margin: 0">Processos</span>
+      <span class="q-ml-sm" style="font-weight: 500; margin: 0">Gestão de processos industriais</span>
     </q-toolbar-title>
 
     <br />
@@ -12,6 +12,7 @@
         dense
         v-model="selectedCompany"
         :options="companies"
+        @input="onFilterChange"
         option-value="codigo"
         option-label="nome"
         emit-value
@@ -20,21 +21,27 @@
         style="width: 300px"
       />
       <q-select
+        @input="onStatusChange"
         filled
         dense
-        v-model="model"
-        :options="options"
+        option-value="codigo"
+        option-label="nome"
+        emit-value
+        map-options
+        v-model="selectedStatus"
+        :options="statusOptions"
         label="Status"
-        style="width: 200px"
+        style="width: 150px"
       />
 
       <q-input
+        @input="onFilterChange"
         filled
         v-model="startDate"
         mask="##/##/####"
         label="Data de ínicio"
         dense
-        style="max-width: 300px"
+        style="max-width: 150px"
       >
         <template v-slot:append>
           <q-icon name="event" class="cursor-pointer">
@@ -44,6 +51,7 @@
               transition-hide="scale"
             >
               <q-date
+                @input="onFilterChange"
                 lang="pt-BR"
                 :locale="dateLocale"
                 v-model="startDate"
@@ -60,12 +68,13 @@
       </q-input>
 
       <q-input
+        @input="onFilterChange"
         filled
         v-model="endDate"
         mask="##/##/####"
         label="Data de fim"
         dense
-        style="max-width: 300px"
+        style="max-width: 150px"
       >
         <template v-slot:append>
           <q-icon name="event" class="cursor-pointer">
@@ -75,6 +84,7 @@
               transition-hide="scale"
             >
               <q-date
+                @input="onFilterChange"
                 lang="pt-BR"
                 :locale="dateLocale"
                 v-model="endDate"
@@ -89,9 +99,9 @@
           </q-icon>
         </template>
       </q-input>
+      <q-btn color="teal" label="Novo processo" dense />
     </div>
     <br />
-
     <q-markup-table>
       <thead>
         <tr>
@@ -99,21 +109,81 @@
           <th class="text-left">Indicativo</th>
           <th class="text-left">Descrição</th>
           <th class="text-left">Planejamento iniciado</th>
-          <th class="text-left">Criado por</th>
+          <th class="text-left">Data prevista de encerramento</th>
           <th class="text-left">Ações</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td class="text-left">Aguardando</td>
+        <tr
+          v-for="industryManagement in industryManagementListFilter"
+          :key="industryManagement.codigo"
+        >
           <td class="text-left">
-            <q-icon name="info" color="green" size="25px" />
+            {{ getStatusDesc(industryManagement.status) }}
           </td>
-          <td class="text-left">Material Requirements Planning (MRP)</td>
-          <td class="text-left">04/01/2021 16:00:00</td>
-          <td class="text-left">Ramon Lacava</td>
+          <td class="text-left">
+            <q-icon
+              name="info"
+              color="grey"
+              size="25px"
+              v-if="industryManagement.codigo == 0"
+            />
+
+            <q-icon
+              name="info"
+              color="blue"
+              size="25px"
+              v-if="industryManagement.codigo == 2"
+            />
+
+            <q-icon
+              name="av_timer"
+              color="blue"
+              size="25px"
+              v-if="industryManagement.codigo == 1"
+            />
+
+            <q-icon
+              name="check_box"
+              color="green"
+              size="25px"
+              v-if="industryManagement.codigo == 4"
+            />
+
+            <q-icon
+              name="error"
+              color="red"
+              size="25px"
+              v-if="industryManagement.codigo == 3"
+            />
+
+            <q-icon
+              name="cancel"
+              color="red"
+              size="25px"
+              v-if="industryManagement.codigo == 5"
+            />
+          </td>
+          <td class="text-left">{{ industryManagement.nome }}</td>
+          <td class="text-left">
+            {{
+              moment(
+                industryManagement.dataInicioPlanejamento,
+                "YYYY-MM-DD"
+              ).format("DD/MM/YYYY")
+            }}
+          </td>
+          <td class="text-left">
+            {{
+              moment(
+                industryManagement.dataFimPlanejamento,
+                "YYYY-MM-DD"
+              ).format("DD/MM/YYYY")
+            }}
+          </td>
           <td class="text-left q-gutter-xs">
-            <q-btn color="primary" label="Visualizar" dense />
+            <q-btn color="teal" label="Visualizar" dense />
+            <q-btn color="red" label="Excluir" dense />
           </td>
         </tr>
       </tbody>
@@ -122,26 +192,70 @@
 </template>
 
 <script>
-import { getIndustryManagementList } from "../services/ProcessoIndustrial";
+import {
+  getIndustryManagementList,
+  getStatusDescription,
+  getStatus,
+} from "../services/ProcessoIndustrial";
 
 export default {
   name: "Processos",
-  methods: {},
-  mounted() {
-    this.industryManagementList = getIndustryManagementList();
+  methods: {
+    async onFilterChange() {
+      this.selectedStatus = this.statusOptions[0];
+
+      this.industryManagementList = await getIndustryManagementList(
+        typeof this.selectedCompany === "object" &&
+          this.selectedCompany !== null
+          ? this.selectedCompany.codigo
+          : this.selectedCompany,
+        this.moment(this.startDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+        this.moment(this.endDate, "DD/MM/YYYY").format("YYYY-MM-DD")
+      );
+      this.industryManagementListFilter = this.industryManagementList;
+    },
+    onStatusChange() {
+      if (this.selectedStatus == -1) {
+        this.industryManagementListFilter = this.industryManagementList;
+        return;
+      }
+
+      this.industryManagementListFilter = this.industryManagementList.filter(
+        (e) => e.status == this.selectedStatus
+      );
+    },
+    getStatusDesc(code) {
+      return getStatusDescription(code);
+    },
+  },
+  async mounted() {
     let userData = JSON.parse(localStorage.getItem("USER_DATA"));
     this.companies = userData.filiais;
     this.selectedCompany = this.companies[0];
 
     let date = new Date();
-    this.startDate = this.moment(new Date(date.getFullYear(), date.getMonth(), 1)).format("DD/MM/YYYY");
-    this.endDate = this.moment(new Date(date.getFullYear(), date.getMonth() + 1, 0)).format("DD/MM/YYYY");
+    this.startDate = this.moment(
+      new Date(date.getFullYear(), date.getMonth(), 1)
+    ).format("DD/MM/YYYY");
+    this.endDate = this.moment(
+      new Date(date.getFullYear(), date.getMonth() + 1, 0)
+    ).format("DD/MM/YYYY");
 
-   
+    this.statusOptions = getStatus();
+    this.selectedStatus = this.statusOptions[0];
+
+    this.industryManagementList = await getIndustryManagementList(
+      this.selectedCompany.codigo,
+      this.moment(this.startDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
+      this.moment(this.endDate, "DD/MM/YYYY").format("YYYY-MM-DD")
+    );
+    this.industryManagementListFilter = this.industryManagementList;
   },
   data() {
     return {
       industryManagementList: [],
+      industryManagementListFilter: [],
+
       companies: [],
       selectedCompany: null,
       startDate: null,
@@ -159,15 +273,8 @@ export default {
         firstDayOfWeek: 1,
       },
       moment: require("moment"),
-      model: "Todos",
-      options: [
-        "Todos",
-        "Aguardando",
-        "Em andamento",
-        "Concluido",
-        "Falha",
-        "Cancelado",
-      ],
+      selectedStatus: null,
+      statusOptions: [],
     };
   },
 };

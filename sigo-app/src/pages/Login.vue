@@ -1,15 +1,16 @@
 <template>
   <q-page
     class="window-height window-width row justify-center items-center"
-    style="background-color: #fff"
+    style="background-color: #fff; background-image: url('https://fcem.com.br/wp-content/uploads/2020/01/conheca-as-normas-de-seguranca-do-trabalho-na-industria-textil.jpeg'); background-repeat: no-repeat; background-size: cover;background-position: right;"
   >
     <div class="column q-pa-lg">
       <div class="row">
-        <q-card square class="shadow-24" style="width: 400px">
-          <q-card-section class="bg-blue">
-            <h4 class="text-h5 text-white q-my-md">
-              Sistema integrado de gestão e operação
-            </h4>
+        <q-card square class="shadow-1" style="width: 400px;">
+          <q-card-section class="bg-white">
+            <br>
+            <img alt="Sigo" src="~assets/sigo-logo.png" style="width: 125px;" />
+            <br>
+            <span style="position: relative;top: 10px;font-weight: 500;">Sistema integrado de gestão e operação</span>
           </q-card-section>
           <q-card-section>
             <q-form class="">
@@ -42,7 +43,9 @@
             <q-btn
               unelevated
               size="md"
-              color="blue"
+              color="blue-grey-7
+
+"
               class="full-width text-white"
               label="Entrar"
               @click="this.validate"
