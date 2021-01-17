@@ -1,16 +1,24 @@
 <template>
   <q-page
     class="window-height window-width row justify-center items-center"
-    style="background-color: #fff; background-image: url('https://fcem.com.br/wp-content/uploads/2020/01/conheca-as-normas-de-seguranca-do-trabalho-na-industria-textil.jpeg'); background-repeat: no-repeat; background-size: cover;background-position: right;"
+    style="
+      background-color: #fff;
+      background-image: url('https://fcem.com.br/wp-content/uploads/2020/01/conheca-as-normas-de-seguranca-do-trabalho-na-industria-textil.jpeg');
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: right;
+    "
   >
     <div class="column q-pa-lg">
       <div class="row">
-        <q-card square class="shadow-1" style="width: 400px;">
+        <q-card square class="shadow-1" style="width: 400px">
           <q-card-section class="bg-white">
-            <br>
-            <img alt="Sigo" src="~assets/sigo-logo.png" style="width: 125px;" />
-            <br>
-            <span style="position: relative;top: 10px;font-weight: 500;">Sistema integrado de gestão e operação</span>
+            <br />
+            <img alt="Sigo" src="~assets/sigo-logo.png" style="width: 125px" />
+            <br />
+            <span style="position: relative; top: 10px; font-weight: 500"
+              >Sistema integrado de gestão e operação</span
+            >
           </q-card-section>
           <q-card-section>
             <q-form class="">
@@ -43,9 +51,8 @@
             <q-btn
               unelevated
               size="md"
-              color="blue-grey-7
-
-"
+              :loading="loading"
+              color="blue-grey-7"
               class="full-width text-white"
               label="Entrar"
               @click="this.validate"
@@ -71,6 +78,7 @@ export default {
     return {
       email: "admin@sigo.com",
       password: "admin",
+      loading: false,
     };
   },
 
@@ -106,9 +114,10 @@ export default {
 
         return;
       }
-
+      this.loading = true;
       let response = await login(this.email, this.password);
       if (response != null && response.status == 200) {
+
         let { access_token, codigo, nome } = response.data;
         localStorage.setItem("TOKEN", access_token);
         localStorage.setItem("CODE", codigo);
@@ -150,6 +159,9 @@ export default {
           timeout: 1000,
         });
       }
+
+      this.loading = false;
+
 
       console.log(response);
     },

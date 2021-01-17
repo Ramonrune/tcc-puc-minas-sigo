@@ -70,13 +70,13 @@ export const getStatusDescription = (statusCode) => {
 }
 
 
-export const addNewStandard = async (body) => {
+export const addNewProcess = async (body) => {
     const config = {
         headers: {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/standards`,
+    return await Vue.prototype.$axios.post(`/api/v1/industry-management`,
         body,
         config).then(response => {
 
@@ -112,52 +112,46 @@ export const getIndustryManagementList = async (codigoFilial, dataInicioPlanejam
 }
 
 
-
-export const getStandardPdf = async (standard) => {
+export const updateProcessStatus = async (body) => {
     const config = {
-        responseType: 'blob',
         headers: {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/standards/pdf/${standard.codigo}`, config).then(response => {
-        const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
+    return await Vue.prototype.$axios.put(`/api/v1/industry-management/${body.codigo}/status/${body.status}`,
+        body,
+        config).then(response => {
 
-        const link = document.createElement('a');
-
-        link.href = downloadUrl;
-
-        link.setAttribute('download', standard.titulo + ".pdf"); //any other extension
-
-        document.body.appendChild(link);
-
-        link.click();
-
-        link.remove();
-    }).catch(err => {
-        console.log(err);
-    });
+            if (response.status == 200) {
+                return response;
+            }
+            return null;
+        }).catch(err => {
+            return null;
+        });
 
 }
 
 
 
-
-
-export const deleteStandard = async (id) => {
+export const deleteProcess = async (id) => {
 
     const config = {
         headers: {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.delete(`/api/v1/standards/${id}`, config).then(response => {
+    
+    return await Vue.prototype.$axios.delete(`/api/v1/industry-management/${id}`, config).then(response => {
+        if (response == undefined) {
+            return  { status: 409 };
+        }
         if (response.status == 204) {
             return response;
         }
         return null;
     }).catch(err => {
-
+        console.log(err);
         if (err.response) {
             return err.response;
         }
