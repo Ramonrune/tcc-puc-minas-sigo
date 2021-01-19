@@ -1,5 +1,8 @@
 package com.sigo.api;
 
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
@@ -26,4 +29,14 @@ public class SigoApiApplication {
 		return new RestTemplate();
 	}
 
+	
+	@Autowired
+	private CachingConnectionFactory connectionFactory;
+
+	@Bean
+	public RabbitAdmin admin()  {
+		RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
+		rabbitAdmin.afterPropertiesSet();
+		return rabbitAdmin;
+	} 
 }
