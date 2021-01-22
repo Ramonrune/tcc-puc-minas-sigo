@@ -134,7 +134,7 @@ export const updateProcessStatus = async (body) => {
 
 
 
-export const deleteProcess = async (id) => {
+export const deleteProcess = async (processToExclude) => {
 
     const config = {
         headers: {
@@ -142,7 +142,7 @@ export const deleteProcess = async (id) => {
         },
     };
     
-    return await Vue.prototype.$axios.delete(`/api/v1/industry-management/${id}`, config).then(response => {
+    return await Vue.prototype.$axios.delete(`/api/v1/industry-management/${processToExclude.codigo}?codigo_filial=${processToExclude.codigoFilial}`, config).then(response => {
         if (response == undefined) {
             return  { status: 409 };
         }

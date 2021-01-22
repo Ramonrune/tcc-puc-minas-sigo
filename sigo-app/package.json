@@ -2,7 +2,7 @@
   "name": "sigo-app",
   "version": "0.0.1",
   "description": "A Quasar Framework app",
-  "productName": "Quasar App",
+  "productName": "Sigo",
   "author": "Ramon Lacava Gutierrez Gonçales <ramonrune@gmail.com>",
   "private": true,
   "scripts": {
@@ -13,6 +13,7 @@
     "axios": "^0.18.1",
     "core-js": "^3.6.5",
     "jwt-decode": "^3.1.2",
+    "pusher-js": "^7.0.2",
     "quasar": "^1.0.0"
   },
   "devDependencies": {

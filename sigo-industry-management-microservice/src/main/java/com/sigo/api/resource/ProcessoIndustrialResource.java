@@ -81,7 +81,8 @@ public class ProcessoIndustrialResource {
 	}
 
 	@DeleteMapping("/{codigo}")
-	public ResponseEntity<?> remove(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) {
+	public ResponseEntity<?> remove(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token,
+			@RequestParam("codigo_filial") Long codigoFilial) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
@@ -89,7 +90,7 @@ public class ProcessoIndustrialResource {
 		}
 
 	
-		 processoIndustrialService.delete(codigo);
+		 processoIndustrialService.delete(codigo, codigoFilial);
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 

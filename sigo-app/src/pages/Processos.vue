@@ -102,6 +102,7 @@
         </template>
       </q-input>
       <q-btn
+        v-if="admin == true"
         color="teal"
         label="Novo processo"
         @click="showProcessWindow = true"
@@ -123,11 +124,12 @@
       <tbody>
         <tr
           v-for="industryManagement in industryManagementListFilter"
-          :key="industryManagement.codigo"
+          :key="industryManagement.codigo + new Date().getTime()"
         >
           <td class="text-left">
             <!-- {{ getStatusDesc(industryManagement.status) }} -->
             <q-select
+              :disable="admin == false"
               @input="onSelectedStatusChange(industryManagement)"
               filled
               dense
@@ -203,6 +205,7 @@
           <td class="text-left q-gutter-xs">
             <q-btn color="teal" label="Visualizar" dense />
             <q-btn
+              v-if="admin == true"
               color="red"
               label="Excluir"
               @click="
@@ -297,6 +300,8 @@
 </template>
 
 <script>
+import Pusher from "pusher-js";
+
 import {
   getIndustryManagementList,
   getStatusDescription,
@@ -305,6 +310,8 @@ import {
   deleteProcess,
   updateProcessStatus,
 } from "../services/ProcessoIndustrial";
+
+import { isMyUserAdmin } from "../services/Usuario";
 
 export default {
   name: "Processos",
@@ -333,7 +340,7 @@ export default {
       }
     },
     async removeProcess() {
-      let response = await deleteProcess(this.processToExclude.codigo);
+      let response = await deleteProcess(this.processToExclude);
       this.processToExclude = null;
       this.showProcessRemoveWindow = false;
 
@@ -409,10 +416,16 @@ export default {
         return;
       }
 
+      console.log(this.selectedCompany);
       this.newProcess.codigoUsuario = JSON.parse(
         localStorage.getItem("USER_DATA")
       ).codigo;
-      this.newProcess.codigoFilial = this.selectedCompany.codigo;
+      this.newProcess.codigoFilial =
+        typeof this.selectedCompany === "object" &&
+        this.selectedCompany !== null
+          ? this.selectedCompany.codigo
+          : this.selectedCompany;
+
       this.newProcess.codigoExterno = "";
 
       let body = { ...this.newProcess };
@@ -465,6 +478,13 @@ export default {
         this.moment(this.endDate, "DD/MM/YYYY").format("YYYY-MM-DD")
       );
       this.industryManagementListFilter = this.industryManagementList;
+
+      this.setupPusher(
+         typeof this.selectedCompany === "object" &&
+          this.selectedCompany !== null
+          ? this.selectedCompany.codigo
+          : this.selectedCompany
+      );
     },
     onStatusChange() {
       if (this.selectedStatus == -1) {
@@ -479,8 +499,83 @@ export default {
     getStatusDesc(code) {
       return getStatusDescription(code);
     },
+    setupPusher(codigo) {
+      console.log('connected to ' + codigo)
+      try {
+        this.pusher.disconnect();
+      } catch (err) {}
+
+      this.pusher = new Pusher("***REMOVED***", {
+        cluster: "us2",
+      });
+
+      this.channel = this.pusher.subscribe(
+        "sigo-industry-management-" + codigo
+      );
+
+      /*
+      {"processoIndustrial":{"codigo":2,"nome":"aaaaaaaaaaaaaaa","status":0,"descricao":"aaaaaaaaaaaaaaaaaaa","dataInicioPlanejamento":{"year":2021,"month":1,"day":21},"dataFimPlanejamento":{"year":2021,"month":1,"day":21},"codigoUsuario":1,"codigoFilial":2,"codigoExterno":"9b40aa8e-2a0d-47e9-8758-eeea62662b28"},"mode":"INSERT"}
+      */
+      this.channel.bind("INSERT",  (data) => {
+
+        console.log(data);
+        data.dataInicioPlanejamento = this.moment(new Date(data.dataInicioPlanejamento.year, data.dataInicioPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
+        data.dataFimPlanejamento = this.moment(new Date(data.dataFimPlanejamento.year, data.dataFimPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
+
+        this.industryManagementListFilter.push(data);
+        //this.industryManagementListFilter.push(data);
+        console.log(JSON.stringify(data));
+      });
+      /*
+      {"processoIndustrial":{"codigo":1,"codigoFilial":2},"mode":"DELETE"}
+      */
+
+      this.channel.bind("DELETE",  (data) => {
+        console.log(data);
+
+        let arr = [];
+
+        for(let item of this.industryManagementListFilter){
+           if(item.codigo != data.codigo){
+             arr.push(item);
+           }
+        }
+
+        this.industryManagementListFilter = arr;
+
+
+      
+      });
+
+      /*
+      {"processoIndustrial":{"codigo":1,"nome":"bbbbbbbbbbbbbb","status":1,"descricao":"aadssadsad","dataInicioPlanejamento":{"year":2021,"month":1,"day":21},"dataFimPlanejamento":{"year":2021,"month":1,"day":21},"codigoUsuario":1,"codigoFilial":2,"codigoExterno":"366b3189-e848-46ab-8a07-1bd4d05187e2","items":[]},"mode":"UPDATE"}
+      */
+       this.channel.bind("UPDATE",  (data) => {
+         console.log(data);
+
+
+        for(let item of this.industryManagementListFilter){
+          let indexOf = this.industryManagementListFilter.indexOf(item);
+          console.log(indexOf);
+           if(item.codigo == data.codigo){
+              data.dataInicioPlanejamento = this.moment(new Date(data.dataInicioPlanejamento.year, data.dataInicioPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
+              data.dataFimPlanejamento = this.moment(new Date(data.dataFimPlanejamento.year, data.dataFimPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
+              this.industryManagementListFilter.splice(indexOf, 1, data);
+
+
+           }
+        }
+
+
+
+      
+      });
+
+
+    },
   },
   async mounted() {
+    this.admin = isMyUserAdmin();
     let userData = JSON.parse(localStorage.getItem("USER_DATA"));
     this.companies = userData.filiais;
     this.selectedCompany = this.companies[0];
@@ -502,9 +597,17 @@ export default {
       this.moment(this.endDate, "DD/MM/YYYY").format("YYYY-MM-DD")
     );
     this.industryManagementListFilter = this.industryManagementList;
+
+    this.setupPusher(this.selectedCompany.codigo);
+  },
+  beforeDestroy() {
+    this.pusher.disconnect();
   },
   data() {
     return {
+      pusher: null,
+      channel: null,
+      admin: false,
       newProcess: {
         nome: "",
         status: 0,

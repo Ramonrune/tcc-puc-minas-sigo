@@ -3,7 +3,6 @@
     class="window-height window-width row justify-center items-center"
     style="
       background-color: #fff;
-      background-image: url('https://fcem.com.br/wp-content/uploads/2020/01/conheca-as-normas-de-seguranca-do-trabalho-na-industria-textil.jpeg');
       background-repeat: no-repeat;
       background-size: cover;
       background-position: right;
@@ -11,13 +10,13 @@
   >
     <div class="column q-pa-lg">
       <div class="row">
-        <q-card square class="shadow-1" style="width: 400px">
+        <q-card square class="shadow-5" style="width: 400px">
           <q-card-section class="bg-white">
             <br />
-            <img alt="Sigo" src="~assets/sigo-logo.png" style="width: 125px" />
+            <img alt="Sigo" src="~assets/sigo-logo.png" style="position: absolute;left: 8px; top: 30px;" />
             <br />
-            <span style="position: relative; top: 10px; font-weight: 500"
-              >Sistema integrado de gestão e operação</span
+            <span style="position: relative; top: 20px;font-size: 18px; "
+              >Entre com seu e-mail e senha</span
             >
           </q-card-section>
           <q-card-section>
@@ -52,7 +51,7 @@
               unelevated
               size="md"
               :loading="loading"
-              color="blue-grey-7"
+              color="blue"
               class="full-width text-white"
               label="Entrar"
               @click="this.validate"

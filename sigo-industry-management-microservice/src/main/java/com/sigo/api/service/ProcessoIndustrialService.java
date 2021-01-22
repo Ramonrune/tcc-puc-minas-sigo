@@ -32,13 +32,14 @@ public class ProcessoIndustrialService {
 
 	}
 
-	public void delete(Long codigo) {
+	public void delete(Long codigo, Long codigoFilial) {
 
 		processoIndustrialRepository.delete(codigo);
 
 		
 		ProcessoIndustrial processoIndustrialNew = new ProcessoIndustrial();
 		processoIndustrialNew.setCodigo(codigo);
+		processoIndustrialNew.setCodigoFilial(codigoFilial);
 
 		producer.produce(processoIndustrialNew, "DELETE");
 

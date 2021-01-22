@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.pusher.rest.Pusher;
 import com.sigo.api.RabbitAmqpLegadoProcessoIndustrialConfiguration;
 import com.sigo.api.dto.QueueOperationDTO;
 import com.sigo.api.model.ProcessoIndustrial;
@@ -26,21 +27,35 @@ public class Consumer {
 
 		String mode = queueOperationDTO.getMode();
 		ProcessoIndustrial processoIndustrial = queueOperationDTO.getProcessoIndustrial();
+		
+		Pusher pusher = new Pusher(System.getenv("PUSHER_APP_ID"), System.getenv("PUSHER_APP_KEY"), System.getenv("PUSHER_APP_SECRET"));
+		pusher.setCluster("us2");
+		pusher.setEncrypted(true);
+
+		
 
 		if (mode.equals("INSERT")) {
+			
+			Long maxTransactionId = processoIndustrialRepository.getMaxTransactionId();
 
-			processoIndustrial.setCodigo(processoIndustrialRepository.getMaxTransactionId() + 1);
-			processoIndustrialRepository.save(processoIndustrial);
+			processoIndustrial.setCodigo((maxTransactionId != null ? maxTransactionId : 0) + 1);
+			ProcessoIndustrial processoIndustrialNew = processoIndustrialRepository.save(processoIndustrial);
+			
+			pusher.trigger("sigo-industry-management-" + processoIndustrialNew.getCodigoFilial(), "INSERT", processoIndustrialNew);
+
 
 		}
 
 		if (mode.equals("UPDATE")) {
-			processoIndustrialRepository.save(processoIndustrial);
+			ProcessoIndustrial processoIndustrialNew = processoIndustrialRepository.save(processoIndustrial);
+			pusher.trigger("sigo-industry-management-" + processoIndustrialNew.getCodigoFilial(), "UPDATE", processoIndustrialNew);
 
 		}
 
 		if (mode.equals("DELETE")) {
 			processoIndustrialRepository.delete(processoIndustrial.getCodigo());
+			pusher.trigger("sigo-industry-management-" + processoIndustrial.getCodigoFilial(), "DELETE", processoIndustrial);
+
 
 		}
 
