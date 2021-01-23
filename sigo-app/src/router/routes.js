@@ -28,6 +28,7 @@ const routes = [
       { path: '', component: () => import('pages/Index.vue') },
       { path: 'normas', component: () => import('pages/NormasTecnicas.vue') },
       { path: 'processos', component: () => import('pages/Processos.vue') },
+      { name: 'processo', path: 'processo', component: () => import('pages/ProcessoDetalhes.vue') },
       { path: 'ocorrencias', component: () => import('pages/Ocorrencias.vue') },
       { path: 'consultorias', component: () => import('pages/Consultoria.vue') },
       { path: 'relatorios', component: () => import('pages/Relatorios.vue') },

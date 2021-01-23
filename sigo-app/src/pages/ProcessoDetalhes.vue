@@ -1,106 +1,28 @@
 <template>
   <div class="q-pa-md">
     <q-toolbar-title shrink class="row items-center no-wrap">
-      <span class="q-ml-sm" style="font-weight: 500; margin: 0"
-        >Gestão de processos industriais</span
+      <span
+        class="q-ml-sm"
+        style="font-weight: 500; margin: 0"
+        v-if="newProcess != null"
+        >{{ newProcess.nome }}</span
       >
-    </q-toolbar-title>
 
+      <br />
+    </q-toolbar-title>
+    <span class="q-ml-sm" style="margin: 0" v-if="newProcess != null"
+      >De
+      {{ moment(newProcess.dataInicioPlanejamento).format("DD/MM/YYYY") }} até
+      {{ moment(newProcess.dataFimPlanejamento).format("DD/MM/YYYY") }}</span
+    >
+    <br />
+    <span class="q-ml-sm" style="margin: 0" v-if="newProcess != null"
+      >Status: {{ getStatusDesc(newProcess.status) }}</span
+    >
+    <br />
     <br />
 
     <div class="row q-gutter-sm">
-      <q-select
-        filled
-        dense
-        v-model="selectedCompany"
-        :options="companies"
-        @input="onFilterChange"
-        option-value="codigo"
-        option-label="nome"
-        emit-value
-        map-options
-        label="Filial"
-        style="width: 300px"
-      />
-      <q-select
-        @input="onStatusChange"
-        filled
-        dense
-        option-value="codigo"
-        option-label="nome"
-        emit-value
-        map-options
-        v-model="selectedStatus"
-        :options="statusOptions"
-        label="Status"
-        style="width: 150px"
-      />
-
-      <q-input
-        @input="onFilterChange"
-        filled
-        v-model="startDate"
-        mask="##/##/####"
-        label="Data de ínicio"
-        dense
-        style="max-width: 150px"
-      >
-        <template v-slot:append>
-          <q-icon name="event" class="cursor-pointer">
-            <q-popup-proxy
-              ref="qDateProxy"
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date
-                @input="onFilterChange"
-                lang="pt-BR"
-                :locale="dateLocale"
-                v-model="startDate"
-                mask="DD/MM/YYYY"
-              >
-                <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Fechar" color="primary" flat />
-                  <q-btn label="OK" color="primary" flat v-close-popup />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-icon>
-        </template>
-      </q-input>
-
-      <q-input
-        @input="onFilterChange"
-        filled
-        v-model="endDate"
-        mask="##/##/####"
-        label="Data de fim"
-        dense
-        style="max-width: 150px"
-      >
-        <template v-slot:append>
-          <q-icon name="event" class="cursor-pointer">
-            <q-popup-proxy
-              ref="qDateProxy"
-              transition-show="scale"
-              transition-hide="scale"
-            >
-              <q-date
-                @input="onFilterChange"
-                lang="pt-BR"
-                :locale="dateLocale"
-                v-model="endDate"
-                mask="DD/MM/YYYY"
-              >
-                <div class="row items-center justify-end">
-                  <q-btn v-close-popup label="Fechar" color="primary" flat />
-                  <q-btn label="OK" color="primary" flat v-close-popup />
-                </div>
-              </q-date>
-            </q-popup-proxy>
-          </q-icon>
-        </template>
-      </q-input>
       <q-btn
         v-if="admin == true"
         color="teal"
@@ -123,7 +45,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="industryManagement in industryManagementListFilter"
+          v-for="industryManagement in industryManagementList"
           :key="industryManagement.codigo + new Date().getTime()"
         >
           <td class="text-left">
@@ -203,7 +125,7 @@
             }}
           </td>
           <td class="text-left q-gutter-xs">
-            <q-btn color="teal" label="Visualizar" dense @click="navigate(industryManagement)"/>
+            <q-btn color="teal" label="Visualizar" dense />
             <q-btn
               v-if="admin == true"
               color="red"
@@ -300,51 +222,15 @@
 </template>
 
 <script>
-import Pusher from "pusher-js";
+import { getStatusDescription } from "../services/ProcessoIndustrial";
 
-import {
-  getIndustryManagementList,
-  getStatusDescription,
-  getStatus,
-  addNewProcess,
-  deleteProcess,
-  updateProcessStatus,
-} from "../services/ProcessoIndustrial";
+import { getIndustryManagementItemsList } from "../services/ProcessoIndustrialItem";
 
 import { isMyUserAdmin } from "../services/Usuario";
 
 export default {
-  name: "Processos",
+  name: "Processo",
   methods: {
-     navigate(industryManagement) {
-      this.$router.push({
-        name: "processo",
-        params: { industryManagement },
-      });
-    },
-    async onSelectedStatusChange(industryManagement) {
-      console.log(industryManagement);
-      let response = await updateProcessStatus(industryManagement);
-
-      if (response != null && response.status == 200) {
-        this.$q.notify({
-          color: "positive",
-          message: "Status do processo atualizado com sucesso!",
-          position: "top",
-          timeout: 1000,
-        });
-        return;
-      } else {
-        await this.onFilterChange();
-        this.$q.notify({
-          color: "negative",
-          message:
-            "Ocorreu um problema ao atualizar o status do processo, tente novamente mais tarde!",
-          position: "top",
-          timeout: 1000,
-        });
-      }
-    },
     async removeProcess() {
       let response = await deleteProcess(this.processToExclude);
       this.processToExclude = null;
@@ -472,147 +358,45 @@ export default {
       });
       return;
     },
-    async onFilterChange() {
-      this.selectedStatus = this.statusOptions[0];
 
-      this.industryManagementList = await getIndustryManagementList(
-        typeof this.selectedCompany === "object" &&
-          this.selectedCompany !== null
-          ? this.selectedCompany.codigo
-          : this.selectedCompany,
-        this.moment(this.startDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
-        this.moment(this.endDate, "DD/MM/YYYY").format("YYYY-MM-DD")
-      );
-      this.industryManagementListFilter = this.industryManagementList;
-
-      this.setupPusher(
-         typeof this.selectedCompany === "object" &&
-          this.selectedCompany !== null
-          ? this.selectedCompany.codigo
-          : this.selectedCompany
-      );
-    },
-    onStatusChange() {
-      if (this.selectedStatus == -1) {
-        this.industryManagementListFilter = this.industryManagementList;
-        return;
-      }
-
-      this.industryManagementListFilter = this.industryManagementList.filter(
-        (e) => e.status == this.selectedStatus
-      );
-    },
     getStatusDesc(code) {
       return getStatusDescription(code);
-    },
-    setupPusher(codigo) {
-      console.log('connected to ' + codigo)
-      try {
-        this.pusher.disconnect();
-      } catch (err) {}
-
-      this.pusher = new Pusher("***REMOVED***", {
-        cluster: "us2",
-      });
-
-      this.channel = this.pusher.subscribe(
-        "sigo-industry-management-" + codigo
-      );
-
-      /*
-      {"processoIndustrial":{"codigo":2,"nome":"aaaaaaaaaaaaaaa","status":0,"descricao":"aaaaaaaaaaaaaaaaaaa","dataInicioPlanejamento":{"year":2021,"month":1,"day":21},"dataFimPlanejamento":{"year":2021,"month":1,"day":21},"codigoUsuario":1,"codigoFilial":2,"codigoExterno":"9b40aa8e-2a0d-47e9-8758-eeea62662b28"},"mode":"INSERT"}
-      */
-      this.channel.bind("INSERT",  (data) => {
-
-        console.log(data);
-        data.dataInicioPlanejamento = this.moment(new Date(data.dataInicioPlanejamento.year, data.dataInicioPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
-        data.dataFimPlanejamento = this.moment(new Date(data.dataFimPlanejamento.year, data.dataFimPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
-
-        this.industryManagementListFilter.push(data);
-        //this.industryManagementListFilter.push(data);
-        console.log(JSON.stringify(data));
-      });
-      /*
-      {"processoIndustrial":{"codigo":1,"codigoFilial":2},"mode":"DELETE"}
-      */
-
-      this.channel.bind("DELETE",  (data) => {
-        console.log(data);
-
-        let arr = [];
-
-        for(let item of this.industryManagementListFilter){
-           if(item.codigo != data.codigo){
-             arr.push(item);
-           }
-        }
-
-        this.industryManagementListFilter = arr;
-
-
-      
-      });
-
-      /*
-      {"processoIndustrial":{"codigo":1,"nome":"bbbbbbbbbbbbbb","status":1,"descricao":"aadssadsad","dataInicioPlanejamento":{"year":2021,"month":1,"day":21},"dataFimPlanejamento":{"year":2021,"month":1,"day":21},"codigoUsuario":1,"codigoFilial":2,"codigoExterno":"366b3189-e848-46ab-8a07-1bd4d05187e2","items":[]},"mode":"UPDATE"}
-      */
-       this.channel.bind("UPDATE",  (data) => {
-         console.log(data);
-
-
-        for(let item of this.industryManagementListFilter){
-          let indexOf = this.industryManagementListFilter.indexOf(item);
-          console.log(indexOf);
-           if(item.codigo == data.codigo){
-              data.dataInicioPlanejamento = this.moment(new Date(data.dataInicioPlanejamento.year, data.dataInicioPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
-              data.dataFimPlanejamento = this.moment(new Date(data.dataFimPlanejamento.year, data.dataFimPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
-              this.industryManagementListFilter.splice(indexOf, 1, data);
-
-
-           }
-        }
-
-
-
-      
-      });
-
-
     },
   },
   async mounted() {
     this.admin = isMyUserAdmin();
-    let userData = JSON.parse(localStorage.getItem("USER_DATA"));
-    this.companies = userData.filiais;
-    this.selectedCompany = this.companies[0];
+    this.companies = JSON.parse(localStorage.getItem("USER_DATA")).filiais;
 
-    let date = new Date();
-    this.startDate = this.moment(
-      new Date(date.getFullYear(), date.getMonth(), 1)
-    ).format("DD/MM/YYYY");
-    this.endDate = this.moment(
-      new Date(date.getFullYear(), date.getMonth() + 1, 0)
-    ).format("DD/MM/YYYY");
+    let industryManagementRouteParam = {
+      codigo: 1,
+      nome: "bbbbbbbbbbbbbb",
+      status: 1,
+      descricao: "aadssadsad",
+      dataInicioPlanejamento: "2021-01-21",
+      dataFimPlanejamento: "2021-01-21",
+      codigoUsuario: 1,
+      codigoFilial: 1,
+      codigoExterno: "366b3189-e848-46ab-8a07-1bd4d05187e2",
+    }; //this.$route.params.industryManagement;
 
-    this.statusOptions = getStatus();
-    this.selectedStatus = this.statusOptions[0];
+    let success = false;
 
-    this.industryManagementList = await getIndustryManagementList(
-      this.selectedCompany.codigo,
-      this.moment(this.startDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
-      this.moment(this.endDate, "DD/MM/YYYY").format("YYYY-MM-DD")
-    );
-    this.industryManagementListFilter = this.industryManagementList;
+    for (let company of this.companies) {
+      if (company.codigo == industryManagementRouteParam.codigoFilial) {
+        success = true;
+      }
+    }
 
-    this.setupPusher(this.selectedCompany.codigo);
-  },
-  beforeDestroy() {
-    this.pusher.disconnect();
+    if (success) {
+      this.newProcess = industryManagementRouteParam; 
+
+      let response = await getIndustryManagementItemsList(this.newProcess.codigo);
+
+      console.log(response);
+    }
   },
   data() {
     return {
-      pusher: null,
-      channel: null,
       admin: false,
       newProcess: {
         nome: "",
@@ -628,27 +412,9 @@ export default {
       showProcessWindow: false,
       showProcessRemoveWindow: false,
       industryManagementList: [],
-      industryManagementListFilter: [],
 
       companies: [],
-      selectedCompany: null,
-      startDate: null,
-      endDate: null,
-      dateLocale: {
-        /* starting with Sunday */
-        days: "Domingo_Segunda_Terca_Quarta_Quinta_Sexta_Sábado".split("_"),
-        daysShort: "Dom_Seg_Ter_Qua_Qui_Sex_Sab".split("_"),
-        months: "Janeiro_Fevereiro_Marco_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro".split(
-          "_"
-        ),
-        monthsShort: "Jan_Fev_Mar_Abr_Mai_Jun_Jul_Ago_Set_Out_Nov_Dez".split(
-          "_"
-        ),
-        firstDayOfWeek: 1,
-      },
       moment: require("moment"),
-      selectedStatus: null,
-      statusOptions: [],
     };
   },
 };

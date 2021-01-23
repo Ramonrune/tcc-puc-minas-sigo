@@ -27,7 +27,7 @@ import com.sigo.api.service.ProcessoIndustrialService;
 import com.sigo.api.token.JwtTokenDecoder;
 
 @RestController
-@RequestMapping("/industry-management")
+@RequestMapping("/industry-management-items")
 public class ProcessoIndustrialResource {
 
 	@Autowired
@@ -35,6 +35,8 @@ public class ProcessoIndustrialResource {
 
 	@Autowired
 	private ProcessoIndustrialService processoIndustrialService;
+	
+	
 
 	@PostMapping
 	public ResponseEntity<?> save(@Valid @RequestBody ProcessoIndustrial processoIndustrial,
@@ -64,6 +66,8 @@ public class ProcessoIndustrialResource {
 
 		return ResponseEntity.ok(findByCodigoFilialAndPeriodoData);
 	}
+	
+
 
 	@PutMapping("/{codigo}/status/{status}")
 	public ResponseEntity<?> updateStatus(@PathVariable(name = "codigo") Long codigo, @PathVariable(name = "status") Long status, @RequestHeader(name = "Authorization") String token) {
