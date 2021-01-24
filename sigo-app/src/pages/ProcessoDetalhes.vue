@@ -4,20 +4,19 @@
       <span
         class="q-ml-sm"
         style="font-weight: 500; margin: 0"
-        v-if="newProcess != null"
-        >{{ newProcess.nome }}</span
+        v-if="process != null"
+        >{{ process.nome }}</span
       >
 
       <br />
     </q-toolbar-title>
-    <span class="q-ml-sm" style="margin: 0" v-if="newProcess != null"
-      >De
-      {{ moment(newProcess.dataInicioPlanejamento).format("DD/MM/YYYY") }} até
-      {{ moment(newProcess.dataFimPlanejamento).format("DD/MM/YYYY") }}</span
+    <span class="q-ml-sm" style="margin: 0" v-if="process != null"
+      >De {{ moment(process.dataInicioPlanejamento).format("DD/MM/YYYY") }} até
+      {{ moment(process.dataFimPlanejamento).format("DD/MM/YYYY") }}</span
     >
     <br />
-    <span class="q-ml-sm" style="margin: 0" v-if="newProcess != null"
-      >Status: {{ getStatusDesc(newProcess.status) }}</span
+    <span class="q-ml-sm" style="margin: 0" v-if="process != null"
+      >Status: {{ getStatusDesc(process.status) }}</span
     >
     <br />
     <br />
@@ -26,7 +25,7 @@
       <q-btn
         v-if="admin == true"
         color="teal"
-        label="Novo processo"
+        label="Novo item de processo"
         @click="showProcessWindow = true"
         dense
       />
@@ -38,8 +37,9 @@
           <th class="text-left">Status</th>
           <th class="text-left">Indicativo</th>
           <th class="text-left">Descrição</th>
-          <th class="text-left">Planejamento iniciado</th>
-          <th class="text-left">Data prevista de encerramento</th>
+          <th class="text-left">Data de início</th>
+          <th class="text-left">H. planejadas</th>
+          <th class="text-left">H. realizadas</th>
           <th class="text-left">Ações</th>
         </tr>
       </thead>
@@ -49,7 +49,6 @@
           :key="industryManagement.codigo + new Date().getTime()"
         >
           <td class="text-left">
-            <!-- {{ getStatusDesc(industryManagement.status) }} -->
             <q-select
               :disable="admin == false"
               @input="onSelectedStatusChange(industryManagement)"
@@ -111,21 +110,15 @@
           <td class="text-left">
             {{
               moment(
-                industryManagement.dataInicioPlanejamento,
-                "YYYY-MM-DD"
-              ).format("DD/MM/YYYY")
+                industryManagement.dataInicio,
+                "YYYY-MM-DD HH:mm:ss"
+              ).format("DD/MM/YYYY HH:mm:ss")
             }}
           </td>
-          <td class="text-left">
-            {{
-              moment(
-                industryManagement.dataFimPlanejamento,
-                "YYYY-MM-DD"
-              ).format("DD/MM/YYYY")
-            }}
-          </td>
+          <td class="text-left">{{ moment.utc(((industryManagement.qtdHorasPrevista * 60) * 1000)).format('HH:mm')}}</td>
+          <td class="text-left">{{ industryManagement.qtdHorasRealizada }}</td>
+
           <td class="text-left q-gutter-xs">
-            <q-btn color="teal" label="Visualizar" dense />
             <q-btn
               v-if="admin == true"
               color="red"
@@ -144,7 +137,7 @@
     <q-dialog v-model="showProcessWindow" persistent>
       <q-card>
         <q-card-section class="row items-center">
-          <span class="text-bold text-h5">Novo processo</span>
+          <span class="text-bold text-h5">Novo item de processo</span>
         </q-card-section>
 
         <q-card-section>
@@ -158,17 +151,17 @@
 
             <q-input
               filled
-              mask="##/##/####"
-              v-model="newProcess.dataInicioPlanejamento"
-              label="Data de inicio de planejamento"
+              mask="##/##/#### ##:##:##"
+              v-model="newProcess.dataInicio"
+              label="Data de inicio"
               class="col-6"
             />
 
             <q-input
               filled
-              mask="##/##/####"
-              v-model="newProcess.dataFimPlanejamento"
-              label="Data prevista de entrega"
+              mask="##:##"
+              v-model="newProcess.qtdHorasPrevista"
+              label="Quantidade de horas estimadas"
               class="col-6"
             />
 
@@ -222,17 +215,48 @@
 </template>
 
 <script>
-import { getStatusDescription } from "../services/ProcessoIndustrial";
+import {
+  getStatusDescription,
+  getStatus,
+} from "../services/ProcessoIndustrial";
 
-import { getIndustryManagementItemsList } from "../services/ProcessoIndustrialItem";
+import {
+  getIndustryManagementItemsList,
+  addNewProcessItem,
+  updateItemProcessStatus,
+  deleteProcessItem,
+} from "../services/ProcessoIndustrialItem";
 
 import { isMyUserAdmin } from "../services/Usuario";
 
 export default {
   name: "Processo",
   methods: {
+    async onSelectedStatusChange(industryManagement) {
+      console.log(industryManagement);
+      let response = await updateItemProcessStatus(industryManagement);
+
+      if (response != null && response.status == 200) {
+        this.$q.notify({
+          color: "positive",
+          message: "Status do item do processo atualizado com sucesso!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      } else {
+        await this.onFilterChange();
+        this.$q.notify({
+          color: "negative",
+          message:
+            "Ocorreu um problema ao atualizar o status do item do processo, tente novamente mais tarde!",
+          position: "top",
+          timeout: 1000,
+        });
+      }
+    },
     async removeProcess() {
-      let response = await deleteProcess(this.processToExclude);
+      let response = await deleteProcessItem(this.processToExclude);
       this.processToExclude = null;
       this.showProcessRemoveWindow = false;
 
@@ -240,7 +264,7 @@ export default {
         await this.onFilterChange();
         this.$q.notify({
           color: "positive",
-          message: "Processo excluido com sucesso!",
+          message: "Item do processo excluido com sucesso!",
           position: "top",
           timeout: 1000,
         });
@@ -249,7 +273,7 @@ export default {
         this.$q.notify({
           color: "negative",
           message:
-            "Ocorreu um problema ao remover o processo, tente novamente mais tarde!",
+            "Ocorreu um problema ao remover o item do processo, tente novamente mais tarde!",
           position: "top",
           timeout: 1000,
         });
@@ -257,14 +281,14 @@ export default {
     },
     resetForm() {
       this.newProcess = {
+        codigoProcessoIndustrial: "",
         nome: "",
         status: 0,
         descricao: "",
-        dataInicioPlanejamento: "",
-        dataFimPlanejamento: "",
-        codigoUsuario: "",
-        codigoFilial: "",
-        codigoExterno: "",
+        dataInicio: "",
+        qtdHorasPrevista: "",
+        qtdHorasRealizada: 0,
+        codigoExternoProcessoIndustrialItem: "",
       };
     },
     async validate() {
@@ -278,7 +302,7 @@ export default {
         return;
       }
 
-      if (this.newProcess.dataInicioPlanejamento.length != 10) {
+      if (this.newProcess.dataInicio.length != 19) {
         this.$q.notify({
           color: "negative",
           message: "Data de início inválida!",
@@ -288,10 +312,10 @@ export default {
         return;
       }
 
-      if (this.newProcess.dataFimPlanejamento.length != 10) {
+      if (this.newProcess.qtdHorasPrevista.length != 5) {
         this.$q.notify({
           color: "negative",
-          message: "Data prevista de encerramento inválida!",
+          message: "Quantidade de horas inválida!",
           position: "top",
           timeout: 1000,
         });
@@ -308,37 +332,27 @@ export default {
         return;
       }
 
-      console.log(this.selectedCompany);
-      this.newProcess.codigoUsuario = JSON.parse(
-        localStorage.getItem("USER_DATA")
-      ).codigo;
-      this.newProcess.codigoFilial =
-        typeof this.selectedCompany === "object" &&
-        this.selectedCompany !== null
-          ? this.selectedCompany.codigo
-          : this.selectedCompany;
-
-      this.newProcess.codigoExterno = "";
-
       let body = { ...this.newProcess };
 
-      body.dataInicioPlanejamento = this.moment(
-        this.newProcess.dataInicioPlanejamento,
-        "DD/MM/YYYY"
-      ).format("YYYY-MM-DD");
+      body.dataInicio = this.moment(
+        this.newProcess.dataInicio,
+        "DD/MM/YYYY HH:mm:ss"
+      ).format("YYYY-MM-DD HH:mm:ss");
 
-      body.dataFimPlanejamento = this.moment(
-        this.newProcess.dataFimPlanejamento,
-        "DD/MM/YYYY"
-      ).format("YYYY-MM-DD");
+      body.qtdHorasPrevista = this.moment
+        .duration(this.newProcess.qtdHorasPrevista, "HH:mm")
+        .asMinutes();
+
+      body.codigoProcessoIndustrial = this.process.codigo;
 
       console.log(body);
-      let response = await addNewProcess(body);
+
+      let response = await addNewProcessItem(body);
       if (response == null || response.status != 201) {
         this.$q.notify({
           color: "negative",
           message:
-            "Ocorreu um problema ao tentar adicionar um novo processo, por favor tente novamente mais tarde!",
+            "Ocorreu um problema ao tentar adicionar um novo item no processo, por favor tente novamente mais tarde!",
           position: "top",
           timeout: 1000,
         });
@@ -352,11 +366,16 @@ export default {
 
       this.$q.notify({
         color: "positive",
-        message: "Processo adicionado com sucesso!",
+        message: "Item do processo adicionado com sucesso!",
         position: "top",
         timeout: 1000,
       });
       return;
+    },
+
+    async onFilterChange() {
+      let response = await getIndustryManagementItemsList(this.process.codigo);
+      this.industryManagementList = response;
     },
 
     getStatusDesc(code) {
@@ -367,7 +386,7 @@ export default {
     this.admin = isMyUserAdmin();
     this.companies = JSON.parse(localStorage.getItem("USER_DATA")).filiais;
 
-    let industryManagementRouteParam = {
+    let industryManagementRouteParam =/* {
       codigo: 1,
       nome: "bbbbbbbbbbbbbb",
       status: 1,
@@ -377,7 +396,7 @@ export default {
       codigoUsuario: 1,
       codigoFilial: 1,
       codigoExterno: "366b3189-e848-46ab-8a07-1bd4d05187e2",
-    }; //this.$route.params.industryManagement;
+    }; */this.$route.params.industryManagement;
 
     let success = false;
 
@@ -388,25 +407,32 @@ export default {
     }
 
     if (success) {
-      this.newProcess = industryManagementRouteParam; 
+      let newProcess = industryManagementRouteParam;
+      this.process = newProcess;
 
-      let response = await getIndustryManagementItemsList(this.newProcess.codigo);
+      let response = await getIndustryManagementItemsList(newProcess.codigo);
 
-      console.log(response);
+      this.industryManagementList = response;
+      this.statusOptions = getStatus();
+
+      this.newProcess.dataInicio = this.moment(new Date()).format(
+        "DD/MM/YYYY HH:mm:ss"
+      );
     }
   },
   data() {
     return {
       admin: false,
+      process: null,
       newProcess: {
+        codigoProcessoIndustrial: "",
         nome: "",
         status: 0,
         descricao: "",
-        dataInicioPlanejamento: "",
-        dataFimPlanejamento: "",
-        codigoUsuario: "",
-        codigoFilial: "",
-        codigoExterno: "",
+        dataInicio: "",
+        qtdHorasPrevista: "08:00",
+        qtdHorasRealizada: 0,
+        codigoExternoProcessoIndustrialItem: "",
       },
       processToExclude: null,
       showProcessWindow: false,
@@ -415,6 +441,7 @@ export default {
 
       companies: [],
       moment: require("moment"),
+      statusOptions: [],
     };
   },
 };

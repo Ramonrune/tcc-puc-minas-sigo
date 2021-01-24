@@ -27,7 +27,7 @@ import com.sigo.api.service.ProcessoIndustrialService;
 import com.sigo.api.token.JwtTokenDecoder;
 
 @RestController
-@RequestMapping("/industry-management-items")
+@RequestMapping("/industry-management")
 public class ProcessoIndustrialResource {
 
 	@Autowired

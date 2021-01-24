@@ -7,18 +7,18 @@ import org.springframework.stereotype.Service;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sigo.api.RabbitAmqpSigoProcessoIndustrialConfiguration;
-import com.sigo.api.dto.QueueOperationDTO;
+import com.sigo.api.dto.QueueOperationProcessoIndustrialDTO;
 import com.sigo.api.model.ProcessoIndustrial;
 
 @Service
-public class Producer {
+public class ProducerProcessoIndustrial {
 
 	@Autowired
 	private RabbitTemplate template;
 
 	public void produce(ProcessoIndustrial processoIndustrial, String mode) {
 		
-		QueueOperationDTO queueOperationDTO = new QueueOperationDTO();
+		QueueOperationProcessoIndustrialDTO queueOperationDTO = new QueueOperationProcessoIndustrialDTO();
 		queueOperationDTO.setProcessoIndustrial(processoIndustrial);
 		queueOperationDTO.setMode(mode);
 

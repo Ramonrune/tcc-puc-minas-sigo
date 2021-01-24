@@ -28,13 +28,14 @@ INSERT INTO processo_industrial VALUES(1, 'Fabricação de tecidos de algodão',
     status SMALLINT NOT NULL,
   	descricao TEXT NOT NULL,
     data_inicio DATETIME NOT NULL,
-    data_fim DATETIME NOT NULL,
+    qtd_horas_prevista SMALLINT NOT NULL,
+    qtd_horas_realizada SMALLINT NOT NULL,
 	codigo_externo_processo_industrial_item VARCHAR(100) NOT NULL,
 	FOREIGN KEY (codigo_processo_industrial) REFERENCES processo_industrial(codigo) ON DELETE CASCADE
  );
  
  INSERT INTO processo_industrial_item VALUES(1, 1, 'Armazenamento do algodão', 3, 'A matéria-prima chega à indústria em grandes fardos de até 190kg, a fim de facilitar a sua armazenagem.',
- '2021-01-12 12:00:00', '2021-01-22 16:00:00',  '65807130-e1b5-424e-b1d7-99823b61b8ae');
+ '2021-01-12 12:00:00', 8, 7,  '65807130-e1b5-424e-b1d7-99823b61b8ae');
 
  
  

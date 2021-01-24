@@ -1,6 +1,6 @@
 package com.sigo.api.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +12,7 @@ import org.hibernate.envers.Audited;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 
 @Entity
 @Audited
@@ -28,15 +29,16 @@ public class ProcessoIndustrialItem {
 	private Integer status;
 	private String descricao;
 
-	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
 	@Column(name = "data_inicio")
-	private LocalDate dataInicio;
+	private LocalDateTime dataInicio;
 
-	@JsonDeserialize(using = LocalDateDeserializer.class)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-	@Column(name = "data_fim")
-	private LocalDate dataFim;
+	@Column(name = "qtd_horas_prevista")
+	private Long qtdHorasPrevista;
+
+	@Column(name = "qtd_horas_realizada")
+	private Long qtdHorasRealizada;
 
 	@Column(name = "codigo_externo_processo_industrial_item")
 	private String codigoExternoProcessoIndustrialItem;
@@ -81,20 +83,28 @@ public class ProcessoIndustrialItem {
 		this.descricao = descricao;
 	}
 
-	public LocalDate getDataInicio() {
+	public LocalDateTime getDataInicio() {
 		return dataInicio;
 	}
 
-	public void setDataInicio(LocalDate dataInicio) {
+	public void setDataInicio(LocalDateTime dataInicio) {
 		this.dataInicio = dataInicio;
 	}
 
-	public LocalDate getDataFim() {
-		return dataFim;
+	public Long getQtdHorasPrevista() {
+		return qtdHorasPrevista;
 	}
 
-	public void setDataFim(LocalDate dataFim) {
-		this.dataFim = dataFim;
+	public void setQtdHorasPrevista(Long qtdHorasPrevista) {
+		this.qtdHorasPrevista = qtdHorasPrevista;
+	}
+
+	public Long getQtdHorasRealizada() {
+		return qtdHorasRealizada;
+	}
+
+	public void setQtdHorasRealizada(Long qtdHorasRealizada) {
+		this.qtdHorasRealizada = qtdHorasRealizada;
 	}
 
 	public String getCodigoExternoProcessoIndustrialItem() {

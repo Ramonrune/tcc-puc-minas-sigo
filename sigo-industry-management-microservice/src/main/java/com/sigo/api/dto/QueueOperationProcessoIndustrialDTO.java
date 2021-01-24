@@ -2,7 +2,7 @@ package com.sigo.api.dto;
 
 import com.sigo.api.model.ProcessoIndustrial;
 
-public class QueueOperationDTO {
+public class QueueOperationProcessoIndustrialDTO{
 
 	private ProcessoIndustrial processoIndustrial;
 	private String mode;

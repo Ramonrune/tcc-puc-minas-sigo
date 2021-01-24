@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.sigo.api.infra.Producer;
+import com.sigo.api.infra.ProducerProcessoIndustrial;
 import com.sigo.api.model.ProcessoIndustrial;
 import com.sigo.api.repository.ProcessoIndustrialRepository;
 
@@ -16,12 +16,16 @@ public class ProcessoIndustrialService {
 	private ProcessoIndustrialRepository processoIndustrialRepository;
 
 	@Autowired
-	private Producer producer;
+	private ProducerProcessoIndustrial producer;
 
 	public ProcessoIndustrial save(ProcessoIndustrial processoIndustrial) {
 
 		Long maxTransactionId = processoIndustrialRepository.getMaxTransactionId();
 
+		if(maxTransactionId == null) {
+			maxTransactionId = Long.valueOf(0);
+		}
+		
 		processoIndustrial.setCodigo(maxTransactionId + 1);
 		processoIndustrial.setCodigoExterno(UUID.randomUUID().toString());
 		ProcessoIndustrial processoIndustrialNew = processoIndustrialRepository.save(processoIndustrial);
