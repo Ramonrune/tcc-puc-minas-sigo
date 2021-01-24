@@ -55,4 +55,15 @@ public class ProcessoIndustrialItemService {
 		producer.produce(processoIndustrialNew, "UPDATE");
 
 	}
+	
+	public void updateHour(Long codigo, Long hour) {
+
+		ProcessoIndustrialItem findOne = processoIndustrialItemRepository.findOne(codigo);
+		findOne.setQtdHorasRealizada(hour);
+
+		ProcessoIndustrialItem processoIndustrialNew = processoIndustrialItemRepository.save(findOne);
+
+		producer.produce(processoIndustrialNew, "UPDATE");
+
+	}
 }

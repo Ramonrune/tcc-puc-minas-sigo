@@ -1,24 +1,34 @@
 <template>
   <div class="q-pa-md">
-    <q-toolbar-title shrink class="row items-center no-wrap">
-      <span
-        class="q-ml-sm"
-        style="font-weight: 500; margin: 0"
-        v-if="process != null"
-        >{{ process.nome }}</span
-      >
+    <q-toolbar style="padding-left: 0px">
+      <q-toolbar-title shrink>
+        <span
+          class="q-ml-sm"
+          style="font-weight: 500; margin-left: 0px"
+          v-if="process != null"
+          >{{ process.nome }}</span
+        >
+      </q-toolbar-title>
+      <q-space />
+    </q-toolbar>
 
-      <br />
-    </q-toolbar-title>
-    <span class="q-ml-sm" style="margin: 0" v-if="process != null"
+    <span
+      class="q-ml-sm"
+      style="margin: 0; font-weight: 500"
+      v-if="process != null"
+      >Status: {{ getStatusDesc(process.status) }}.</span
+    >
+    &nbsp;
+
+    <span
+      class="q-ml-sm"
+      style="margin: 0; font-weight: 500"
+      v-if="process != null"
       >De {{ moment(process.dataInicioPlanejamento).format("DD/MM/YYYY") }} até
       {{ moment(process.dataFimPlanejamento).format("DD/MM/YYYY") }}</span
     >
     <br />
-    <span class="q-ml-sm" style="margin: 0" v-if="process != null"
-      >Status: {{ getStatusDesc(process.status) }}</span
-    >
-    <br />
+
     <br />
 
     <div class="row q-gutter-sm">
@@ -115,8 +125,42 @@
               ).format("DD/MM/YYYY HH:mm:ss")
             }}
           </td>
-          <td class="text-left">{{ moment.utc(((industryManagement.qtdHorasPrevista * 60) * 1000)).format('HH:mm')}}</td>
-          <td class="text-left">{{ industryManagement.qtdHorasRealizada }}</td>
+          <td class="text-left">
+            {{
+              moment
+                .utc(industryManagement.qtdHorasPrevista * 60 * 1000)
+                .format("HH:mm")
+            }}
+          </td>
+          <td class="text-left">
+            <q-input
+              style="max-width: 125px"
+              @input="
+                (val) => {
+                  inputHour(val, industryManagement);
+                }
+              "
+              :ref="industryManagement.codigo"
+              filled
+              mask="##:##"
+              :value="
+                moment
+                  .utc(industryManagement.qtdHorasRealizada * 60 * 1000)
+                  .format('HH:mm')
+              "
+              dense
+            >
+              <template slot:append>
+                <q-btn
+                  flat
+                  dense
+                  color="positive"
+                  icon="check_circle"
+                  @click="changeHour(industryManagement)"
+                />
+              </template>
+            </q-input>
+          </td>
 
           <td class="text-left q-gutter-xs">
             <q-btn
@@ -224,6 +268,7 @@ import {
   getIndustryManagementItemsList,
   addNewProcessItem,
   updateItemProcessStatus,
+  updateItemProcessHour,
   deleteProcessItem,
 } from "../services/ProcessoIndustrialItem";
 
@@ -232,6 +277,50 @@ import { isMyUserAdmin } from "../services/Usuario";
 export default {
   name: "Processo",
   methods: {
+    async changeHour(industryManagement){
+      let ref= this.$refs[industryManagement.codigo];
+      let value = ref[0].$el.getElementsByTagName('input')[0].value;
+
+
+      let hour = this.moment
+        .duration(value, "HH:mm")
+        .asMinutes();
+
+      let body = {
+        codigo: industryManagement.codigo,
+        hour: hour
+      }
+
+      let response = await updateItemProcessHour(body);
+
+      if (response != null && response.status == 200) {
+
+        industryManagement.qtdHorasRealizada = hour;
+        
+        this.$q.notify({
+          color: "positive",
+          message: "Hora realizada do item do processo atualizado com sucesso!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      } else {
+        await this.onFilterChange();
+        this.$q.notify({
+          color: "negative",
+          message:
+            "Ocorreu um problema ao atualizar as horas realizadas do item do processo, tente novamente mais tarde!",
+          position: "top",
+          timeout: 1000,
+        });
+      }
+
+      
+
+      
+    },
+    inputHour(val, industryManagement) {
+    },
     async onSelectedStatusChange(industryManagement) {
       console.log(industryManagement);
       let response = await updateItemProcessStatus(industryManagement);
@@ -386,7 +475,7 @@ export default {
     this.admin = isMyUserAdmin();
     this.companies = JSON.parse(localStorage.getItem("USER_DATA")).filiais;
 
-    let industryManagementRouteParam =/* {
+    let industryManagementRouteParam = /* {
       codigo: 1,
       nome: "bbbbbbbbbbbbbb",
       status: 1,
@@ -396,7 +485,8 @@ export default {
       codigoUsuario: 1,
       codigoFilial: 1,
       codigoExterno: "366b3189-e848-46ab-8a07-1bd4d05187e2",
-    }; */this.$route.params.industryManagement;
+    }; */ this
+      .$route.params.industryManagement;
 
     let success = false;
 

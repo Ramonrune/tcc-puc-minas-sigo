@@ -22,6 +22,29 @@ export const addNewProcessItem = async (body) => {
 }
 
 
+export const updateItemProcessHour = async (body) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+    };
+    return await Vue.prototype.$axios.put(`/api/v1/industry-management-items/${body.codigo}/hour/${body.hour}`,
+        body,
+        config).then(response => {
+
+            if (response.status == 200) {
+                return response;
+            }
+            return null;
+        }).catch(err => {
+            return null;
+        });
+
+}
+
+
+
+
 
 export const updateItemProcessStatus = async (body) => {
     const config = {

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sigo.api.model.JsonWebToken;
@@ -77,6 +78,22 @@ public class ProcessoIndustrialItemsResource {
 		}
 
 		processoIndustrialItemService.updateStatus(codigo, status);
+
+		return ResponseEntity.status(HttpStatus.OK).build();
+
+	}
+	
+	@PutMapping("/{codigo}/hour/{hour}")
+	public ResponseEntity<?> updateItemHour(@PathVariable(name = "codigo") Long codigo,
+			@PathVariable("hour") Long hour,
+			@RequestHeader(name = "Authorization") String token) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+
+		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+
+		processoIndustrialItemService.updateHour(codigo, hour);
 
 		return ResponseEntity.status(HttpStatus.OK).build();
 
