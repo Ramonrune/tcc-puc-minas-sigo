@@ -35,8 +35,6 @@ public class ProcessoIndustrialResource {
 
 	@Autowired
 	private ProcessoIndustrialService processoIndustrialService;
-	
-	
 
 	@PostMapping
 	public ResponseEntity<?> save(@Valid @RequestBody ProcessoIndustrial processoIndustrial,
@@ -54,7 +52,7 @@ public class ProcessoIndustrialResource {
 
 	@GetMapping
 	public ResponseEntity<?> findAll(@RequestParam("codigo_filial") Long codigoFilial,
-			@RequestParam("data_inicio_planejamento")  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicioPlanejamento,
+			@RequestParam("data_inicio_planejamento") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicioPlanejamento,
 			@RequestParam("data_fim_planejamento") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFimPlanejamento) {
 
 		if (dataInicioPlanejamento == null || dataFimPlanejamento == null || codigoFilial == null) {
@@ -66,19 +64,17 @@ public class ProcessoIndustrialResource {
 
 		return ResponseEntity.ok(findByCodigoFilialAndPeriodoData);
 	}
-	
-
 
 	@PutMapping("/{codigo}/status/{status}")
-	public ResponseEntity<?> updateStatus(@PathVariable(name = "codigo") Long codigo, @PathVariable(name = "status") Long status, @RequestHeader(name = "Authorization") String token) {
+	public ResponseEntity<?> updateStatus(@PathVariable(name = "codigo") Long codigo,
+			@PathVariable(name = "status") Long status, @RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 
-	
-		 processoIndustrialService.updateStatus(codigo, status);
+		processoIndustrialService.updateStatus(codigo, status);
 
 		return ResponseEntity.status(HttpStatus.OK).build();
 
@@ -93,10 +89,12 @@ public class ProcessoIndustrialResource {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 
-	
-		 processoIndustrialService.delete(codigo, codigoFilial);
+		processoIndustrialService.delete(codigo, codigoFilial);
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}
+
+	
+
 }

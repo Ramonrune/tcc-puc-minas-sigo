@@ -29,14 +29,14 @@ public class SigoApiApplication {
 		return new RestTemplate();
 	}
 
-	
 	@Autowired
 	private CachingConnectionFactory connectionFactory;
 
 	@Bean
-	public RabbitAdmin admin()  {
+	public RabbitAdmin admin() {
 		RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
 		rabbitAdmin.afterPropertiesSet();
 		return rabbitAdmin;
-	} 
+	}
+
 }
