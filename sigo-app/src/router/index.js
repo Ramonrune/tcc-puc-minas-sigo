@@ -2,8 +2,13 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import routes from './routes'
+import VueApexCharts from 'vue-apexcharts'
 
 Vue.use(VueRouter)
+
+Vue.use(VueApexCharts)
+Vue.component('apexchart', VueApexCharts)
+
 
 /*
  * If not building with SSR mode, you can

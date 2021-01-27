@@ -10,6 +10,35 @@
         >
       </q-toolbar-title>
       <q-space />
+
+      <q-card class="my-card" v-if="logisticsResponse.length != 0">
+        <q-card-section class="bg-primary text-white">
+          <div class="text-h6">Insumos</div>
+          <div class="text-subtitle2">
+            {{ numberToReal(logisticsResponse[1].logistic.value) }}
+          </div>
+        </q-card-section>
+      </q-card>
+
+      &nbsp;
+      <q-card class="my-card" v-if="logisticsResponse.length != 0">
+        <q-card-section class="bg-green text-white">
+          <div class="text-h6">Venda</div>
+          <div class="text-subtitle2">
+            {{ numberToReal(logisticsResponse[1].logistic.value * 2) }}
+          </div>
+        </q-card-section>
+      </q-card>
+
+       &nbsp;
+      <q-card class="my-card" v-if="logisticsResponse.length != 0">
+        <q-card-section class="bg-grey text-white">
+          <div class="text-h6">Entrega</div>
+          <div class="text-subtitle2">
+            30/06/2021
+          </div>
+        </q-card-section>
+      </q-card>
     </q-toolbar>
 
     <span
@@ -270,6 +299,7 @@ import {
   updateItemProcessStatus,
   updateItemProcessHour,
   deleteProcessItem,
+  getLogistics,
 } from "../services/ProcessoIndustrialItem";
 
 import { isMyUserAdmin } from "../services/Usuario";
@@ -277,26 +307,27 @@ import { isMyUserAdmin } from "../services/Usuario";
 export default {
   name: "Processo",
   methods: {
-    async changeHour(industryManagement){
-      let ref= this.$refs[industryManagement.codigo];
-      let value = ref[0].$el.getElementsByTagName('input')[0].value;
+    numberToReal(numero) {
+      var numero = Number(numero).toFixed(2).split(".");
+      numero[0] = "R$ " + numero[0].split(/(?=(?:...)*$)/).join(".");
+      return numero.join(",");
+    },
+    async changeHour(industryManagement) {
+      let ref = this.$refs[industryManagement.codigo];
+      let value = ref[0].$el.getElementsByTagName("input")[0].value;
 
-
-      let hour = this.moment
-        .duration(value, "HH:mm")
-        .asMinutes();
+      let hour = this.moment.duration(value, "HH:mm").asMinutes();
 
       let body = {
         codigo: industryManagement.codigo,
-        hour: hour
-      }
+        hour: hour,
+      };
 
       let response = await updateItemProcessHour(body);
 
       if (response != null && response.status == 200) {
-
         industryManagement.qtdHorasRealizada = hour;
-        
+
         this.$q.notify({
           color: "positive",
           message: "Hora realizada do item do processo atualizado com sucesso!",
@@ -314,13 +345,8 @@ export default {
           timeout: 1000,
         });
       }
-
-      
-
-      
     },
-    inputHour(val, industryManagement) {
-    },
+    inputHour(val, industryManagement) {},
     async onSelectedStatusChange(industryManagement) {
       console.log(industryManagement);
       let response = await updateItemProcessStatus(industryManagement);
@@ -508,6 +534,10 @@ export default {
       this.newProcess.dataInicio = this.moment(new Date()).format(
         "DD/MM/YYYY HH:mm:ss"
       );
+
+      let logisticsResponse = await getLogistics(newProcess.codigo);
+      this.logisticsResponse = logisticsResponse;
+      console.log(this.logisticsResponse[0].logistic.value);
     }
   },
   data() {
@@ -532,6 +562,7 @@ export default {
       companies: [],
       moment: require("moment"),
       statusOptions: [],
+      logisticsResponse: [],
     };
   },
 };

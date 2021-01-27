@@ -88,6 +88,24 @@ export const getIndustryManagementItemsList = async (codigo) => {
 
 }
 
+
+export const getLogistics = async (codigo) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+    };
+    return await Vue.prototype.$axios.get(`/api/v1/logistics/${codigo}`, config).then(response => {
+        if (response.status == 200) {
+            return response.data;
+        }
+        return null;
+    }).catch(err => {
+        return null;
+    });
+
+}
+
 export const deleteProcessItem = async (processToExclude) => {
 
     const config = {

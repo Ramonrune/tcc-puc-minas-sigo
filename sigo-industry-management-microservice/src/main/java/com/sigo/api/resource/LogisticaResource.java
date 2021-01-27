@@ -1,6 +1,10 @@
 package com.sigo.api.resource;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,10 +22,15 @@ public class LogisticaResource {
 	@Autowired
 	private LogisticaClient logisticaClient;
 
-	@GetMapping("/{codigo}")
+	@GetMapping(path = "/{codigo}", produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<?> getLogistic(@PathVariable(name = "codigo") Long codigo) {
-		GetLogisticsResponse response = logisticaClient.getLogistic(String.valueOf(codigo));
+		GetLogisticsResponse response01 = logisticaClient.getLogistic(String.valueOf(1));
+		GetLogisticsResponse response02 = logisticaClient.getLogistic(String.valueOf(2));
 
-		return ResponseEntity.ok(response);
+		List<GetLogisticsResponse> list = new ArrayList<>();
+		list.add(response01);
+		list.add(response02);
+		
+		return ResponseEntity.ok(list);
 	}
 }
