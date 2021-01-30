@@ -88,7 +88,6 @@
           </q-icon>
         </template>
       </q-input>
-    
     </div>
     <br />
     <q-markup-table>
@@ -96,6 +95,7 @@
         <tr>
           <th class="text-left">Status</th>
           <th class="text-left">Indicativo</th>
+          <th class="text-left">Nome</th>
           <th class="text-left">Descrição</th>
           <th class="text-left">Data de registro</th>
           <th class="text-left">Ações</th>
@@ -118,15 +118,14 @@
               emit-value
               map-options
               v-model="occurence.status"
-              :options="statusOptions.slice(1, statusOptions.length)"
-              style="width: 150px"
+              :options="statusOptions"
+              style="width: 160px"
             />
           </td>
           <td class="text-left">
-            
             <q-icon
-              name="error"
-              color="red"
+              name="av_timer"
+              color="blue"
               size="25px"
               v-if="occurence.status == 0"
             />
@@ -137,20 +136,17 @@
               size="25px"
               v-if="occurence.status == 1"
             />
-
-
-        
           </td>
           <td class="text-left">{{ occurence.nome }}</td>
+          <td class="text-left">{{ occurence.descricao }}</td>
           <td class="text-left">
             {{
-              moment(
-                occurence.dataInicio,
-                "YYYY-MM-DD"
-              ).format("DD/MM/YYYY")
+              moment(occurence.dataOcorrencia, "YYYY-MM-DD HH:mm:ss").format(
+                "DD/MM/YYYY HH:mm:ss"
+              )
             }}
           </td>
-        
+
           <td class="text-left q-gutter-xs">
             <q-btn
               v-if="admin == true"
@@ -166,7 +162,6 @@
         </tr>
       </tbody>
     </q-markup-table>
-
 
     <q-dialog v-model="showOccurenceRemoveWindow" persistent>
       <q-card>
@@ -196,20 +191,19 @@
 </template>
 
 <script>
-
-import {getStatus, getStatusDescription, deleteOccurrence, updateOccurrenceStatus, getOccurrenceList} from '../services/Ocorrencias';
+import {
+  getStatus,
+  getStatusDescription,
+  deleteOccurrence,
+  updateOccurrenceStatus,
+  getOccurrenceList,
+} from "../services/Ocorrencias";
 
 import { isMyUserAdmin } from "../services/Usuario";
 
 export default {
   name: "Processos",
   methods: {
-     navigate(industryManagement) {
-      this.$router.push({
-        name: "processo",
-        params: { industryManagement },
-      });
-    },
     async onSelectedStatusChange(occurence) {
       console.log(occurence);
       let response = await updateOccurrenceStatus(occurence);
@@ -268,18 +262,6 @@ export default {
         this.moment(this.startDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
         this.moment(this.endDate, "DD/MM/YYYY").format("YYYY-MM-DD")
       );
-
-     
-    },
-    onStatusChange() {
-      if (this.selectedStatus == -1) {
-        this.industryManagementListFilter = this.industryManagementList;
-        return;
-      }
-
-      this.industryManagementListFilter = this.industryManagementList.filter(
-        (e) => e.status == this.selectedStatus
-      );
     },
     getStatusDesc(code) {
       return getStatusDescription(code);
@@ -302,14 +284,13 @@ export default {
     this.statusOptions = getStatus();
     this.selectedStatus = this.statusOptions[0];
 
-    this.occurenceList = await getIndustryManagementList(
+    this.occurenceList = await getOccurrenceList(
       this.selectedCompany.codigo,
       this.moment(this.startDate, "DD/MM/YYYY").format("YYYY-MM-DD"),
       this.moment(this.endDate, "DD/MM/YYYY").format("YYYY-MM-DD")
     );
-
   },
-  
+
   data() {
     return {
       admin: false,

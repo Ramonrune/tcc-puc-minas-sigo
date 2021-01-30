@@ -1,64 +1,69 @@
 <template>
   <div class="q-pa-md">
-    <q-toolbar style="padding-left: 0px">
-      <q-toolbar-title shrink>
+    <div class="row" style="padding-left: 0px">
+      <div>
+        <q-toolbar-title shrink>
+          <span
+            class="q-ml-sm"
+            style="font-weight: 500; margin-left: 0px"
+            v-if="process != null"
+            >{{ process.nome }}</span
+          >
+        </q-toolbar-title>
+        <br />
         <span
           class="q-ml-sm"
-          style="font-weight: 500; margin-left: 0px"
+          style="margin: 0; font-weight: 500"
           v-if="process != null"
-          >{{ process.nome }}</span
+          >Status: {{ getStatusDesc(process.status) }}.</span
         >
-      </q-toolbar-title>
+        &nbsp;
+
+        <span
+          class="q-ml-sm"
+          style="margin: 0; font-weight: 500"
+          v-if="process != null"
+          >De
+          {{ moment(process.dataInicioPlanejamento).format("DD/MM/YYYY") }} até
+          {{ moment(process.dataFimPlanejamento).format("DD/MM/YYYY") }}</span
+        >
+      </div>
       <q-space />
 
-      <q-card class="my-card" v-if="logisticsResponse.length != 0">
-        <q-card-section class="bg-primary text-white">
-          <div class="text-h6">Insumos</div>
-          <div class="text-subtitle2">
-            {{ numberToReal(logisticsResponse[1].logistic.value) }}
-          </div>
-        </q-card-section>
-      </q-card>
+      <div>
+        <div class="row">
+          <q-card class="my-card" v-if="logisticsResponse.length != 0">
+            <q-card-section class="bg-primary text-white">
+              <div class="text-h6">Insumos</div>
+              <div class="text-subtitle2">
+                {{ numberToReal(logisticsResponse[1].logistic.value) }}
+              </div>
+            </q-card-section>
+          </q-card>
 
-      &nbsp;
-      <q-card class="my-card" v-if="logisticsResponse.length != 0">
-        <q-card-section class="bg-green text-white">
-          <div class="text-h6">Venda</div>
-          <div class="text-subtitle2">
-            {{ numberToReal(logisticsResponse[1].logistic.value * 2) }}
-          </div>
-        </q-card-section>
-      </q-card>
+          &nbsp;
+          <q-card class="my-card" v-if="logisticsResponse.length != 0">
+            <q-card-section class="bg-green text-white">
+              <div class="text-h6">Venda</div>
+              <div class="text-subtitle2">
+                {{ numberToReal(logisticsResponse[1].logistic.value * 2) }}
+              </div>
+            </q-card-section>
+          </q-card>
 
-       &nbsp;
-      <q-card class="my-card" v-if="logisticsResponse.length != 0">
-        <q-card-section class="bg-grey text-white">
-          <div class="text-h6">Entrega</div>
-          <div class="text-subtitle2">
-            30/06/2021
-          </div>
-        </q-card-section>
-      </q-card>
-    </q-toolbar>
-
-    <span
-      class="q-ml-sm"
-      style="margin: 0; font-weight: 500"
-      v-if="process != null"
-      >Status: {{ getStatusDesc(process.status) }}.</span
-    >
-    &nbsp;
-
-    <span
-      class="q-ml-sm"
-      style="margin: 0; font-weight: 500"
-      v-if="process != null"
-      >De {{ moment(process.dataInicioPlanejamento).format("DD/MM/YYYY") }} até
-      {{ moment(process.dataFimPlanejamento).format("DD/MM/YYYY") }}</span
-    >
-    <br />
+          &nbsp;
+          <q-card class="my-card" v-if="logisticsResponse.length != 0">
+            <q-card-section class="bg-grey text-white">
+              <div class="text-h6">Entrega</div>
+              <div class="text-subtitle2">30/06/2021</div>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+    </div>
 
     <br />
+
 
     <div class="row q-gutter-sm">
       <q-btn

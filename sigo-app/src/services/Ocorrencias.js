@@ -102,7 +102,7 @@ export const deleteOccurrence = async (occurrenceToExclude) => {
         },
     };
     
-    return await Vue.prototype.$axios.delete(`/api/v1/occurrence/${occurrenceToExclude.codigo}?codigo_filial=${occurrenceToExclude.codigoFilial}`, config).then(response => {
+    return await Vue.prototype.$axios.delete(`/api/v1/occurrence/${occurrenceToExclude.codigo}`, config).then(response => {
         if (response == undefined) {
             return  { status: 409 };
         }

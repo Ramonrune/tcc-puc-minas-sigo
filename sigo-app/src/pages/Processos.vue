@@ -203,7 +203,22 @@
             }}
           </td>
           <td class="text-left q-gutter-xs">
-            <q-btn color="teal" label="Visualizar" dense @click="navigate(industryManagement)"/>
+            <q-btn
+              color="orange"
+              label="Nova ocorrência"
+              dense
+              @click="
+                showOccurenceWindow = true;
+                ocurrenceIndustryManagement = industryManagement;
+              "
+            />
+
+            <q-btn
+              color="teal"
+              label="Visualizar"
+              dense
+              @click="navigate(industryManagement)"
+            />
             <q-btn
               v-if="admin == true"
               color="red"
@@ -272,6 +287,51 @@
       </q-card>
     </q-dialog>
 
+    <q-dialog v-model="showOccurenceWindow" persistent>
+      <q-card>
+        <q-card-section class="row items-center">
+          <span class="text-bold text-h5">Nova ocorrência</span>
+        </q-card-section>
+
+        <q-card-section>
+          <div class="row q-col-gutter-xs">
+            <q-input
+              filled
+              v-model="newOccurence.nome"
+              label="Nome"
+              class="col-12"
+            />
+
+            <q-input
+              filled
+              mask="##/##/#### ##:##:##"
+              v-model="newOccurence.dataOcorrencia"
+              label="Data da ocorrência"
+              class="col-12"
+            />
+
+            <q-input
+              filled
+              type="textarea"
+              v-model="newOccurence.descricao"
+              label="Descrição"
+              class="col-12"
+            />
+          </div>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn
+            label="Cancelar"
+            color="red"
+            v-close-popup
+            @click="resetOccurenceForm"
+          />
+          <q-btn label="Cadastrar" color="primary" @click="validateOccurence" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
     <q-dialog v-model="showProcessRemoveWindow" persistent>
       <q-card>
         <q-card-section class="row items-center">
@@ -311,12 +371,14 @@ import {
   updateProcessStatus,
 } from "../services/ProcessoIndustrial";
 
+import { addNewOccurrence } from "../services/Ocorrencias";
+
 import { isMyUserAdmin } from "../services/Usuario";
 
 export default {
   name: "Processos",
   methods: {
-     navigate(industryManagement) {
+    navigate(industryManagement) {
       this.$router.push({
         name: "processo",
         params: { industryManagement },
@@ -380,6 +442,95 @@ export default {
         codigoFilial: "",
         codigoExterno: "",
       };
+    },
+
+    resetOccurenceForm() {
+      this.newOccurence = {
+        nome: "",
+        status: 0,
+        descricao: "",
+        dataOcorrencia: "",
+        codigoUsuario: "",
+        codigoFilial: "",
+        codigoProcessoIndustrial: "",
+      };
+      this.codigoProcessoIndustrial = null;
+    },
+    async validateOccurence() {
+      if (this.newOccurence.nome.trim() == "") {
+        this.$q.notify({
+          color: "negative",
+          message: "Nome deve ser preenchido!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      }
+
+      if (this.newOccurence.dataOcorrencia.length != 19) {
+        this.$q.notify({
+          color: "negative",
+          message: "Data da ocorrência inválida!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      }
+
+      if (this.newOccurence.descricao.trim() == "") {
+        this.$q.notify({
+          color: "negative",
+          message: "Descrição deve ser preenchida!",
+          position: "top",
+          timeout: 1000,
+        });
+        return;
+      }
+
+      this.newOccurence.codigoUsuario = JSON.parse(
+        localStorage.getItem("USER_DATA")
+      ).codigo;
+      this.newOccurence.codigoFilial =
+        typeof this.selectedCompany === "object" &&
+        this.selectedCompany !== null
+          ? this.selectedCompany.codigo
+          : this.selectedCompany;
+
+      this.newOccurence.codigoProcessoIndustrial = this.ocurrenceIndustryManagement.codigo;
+
+      console.log( this.newOccurence);
+
+
+      let body = { ...this.newOccurence };
+
+      body.dataOcorrencia = this.moment(
+        this.newOccurence.dataOcorrencia,
+        "DD/MM/YYYY HH:mm:ss"
+      ).format("YYYY-MM-DD HH:mm:ss");
+
+      let response = await addNewOccurrence(body);
+      if (response == null || response.status != 201) {
+        this.$q.notify({
+          color: "negative",
+          message:
+            "Ocorreu um problema ao tentar adicionar uma nova ocorrência, por favor tente novamente mais tarde!",
+          position: "top",
+          timeout: 1000,
+        });
+
+        return;
+      }
+
+      this.resetOccurenceForm();
+      this.showOccurenceWindow = false;
+
+      this.$q.notify({
+        color: "positive",
+        message: "Ocorrência adicionada com sucesso!",
+        position: "top",
+        timeout: 1000,
+      });
+      return;
     },
     async validate() {
       if (this.newProcess.nome.trim() == "") {
@@ -486,7 +637,7 @@ export default {
       this.industryManagementListFilter = this.industryManagementList;
 
       this.setupPusher(
-         typeof this.selectedCompany === "object" &&
+        typeof this.selectedCompany === "object" &&
           this.selectedCompany !== null
           ? this.selectedCompany.codigo
           : this.selectedCompany
@@ -506,7 +657,7 @@ export default {
       return getStatusDescription(code);
     },
     setupPusher(codigo) {
-      console.log('connected to ' + codigo)
+      console.log("connected to " + codigo);
       try {
         this.pusher.disconnect();
       } catch (err) {}
@@ -522,11 +673,22 @@ export default {
       /*
       {"processoIndustrial":{"codigo":2,"nome":"aaaaaaaaaaaaaaa","status":0,"descricao":"aaaaaaaaaaaaaaaaaaa","dataInicioPlanejamento":{"year":2021,"month":1,"day":21},"dataFimPlanejamento":{"year":2021,"month":1,"day":21},"codigoUsuario":1,"codigoFilial":2,"codigoExterno":"9b40aa8e-2a0d-47e9-8758-eeea62662b28"},"mode":"INSERT"}
       */
-      this.channel.bind("INSERT",  (data) => {
-
+      this.channel.bind("INSERT", (data) => {
         console.log(data);
-        data.dataInicioPlanejamento = this.moment(new Date(data.dataInicioPlanejamento.year, data.dataInicioPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
-        data.dataFimPlanejamento = this.moment(new Date(data.dataFimPlanejamento.year, data.dataFimPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
+        data.dataInicioPlanejamento = this.moment(
+          new Date(
+            data.dataInicioPlanejamento.year,
+            data.dataInicioPlanejamento.month,
+            data.dataFimPlanejamento.day
+          )
+        ).format("YYYY-MM-DD");
+        data.dataFimPlanejamento = this.moment(
+          new Date(
+            data.dataFimPlanejamento.year,
+            data.dataFimPlanejamento.month,
+            data.dataFimPlanejamento.day
+          )
+        ).format("YYYY-MM-DD");
 
         this.industryManagementListFilter.push(data);
         //this.industryManagementListFilter.push(data);
@@ -536,48 +698,48 @@ export default {
       {"processoIndustrial":{"codigo":1,"codigoFilial":2},"mode":"DELETE"}
       */
 
-      this.channel.bind("DELETE",  (data) => {
+      this.channel.bind("DELETE", (data) => {
         console.log(data);
 
         let arr = [];
 
-        for(let item of this.industryManagementListFilter){
-           if(item.codigo != data.codigo){
-             arr.push(item);
-           }
+        for (let item of this.industryManagementListFilter) {
+          if (item.codigo != data.codigo) {
+            arr.push(item);
+          }
         }
 
         this.industryManagementListFilter = arr;
-
-
-      
       });
 
       /*
       {"processoIndustrial":{"codigo":1,"nome":"bbbbbbbbbbbbbb","status":1,"descricao":"aadssadsad","dataInicioPlanejamento":{"year":2021,"month":1,"day":21},"dataFimPlanejamento":{"year":2021,"month":1,"day":21},"codigoUsuario":1,"codigoFilial":2,"codigoExterno":"366b3189-e848-46ab-8a07-1bd4d05187e2","items":[]},"mode":"UPDATE"}
       */
-       this.channel.bind("UPDATE",  (data) => {
-         console.log(data);
+      this.channel.bind("UPDATE", (data) => {
+        console.log(data);
 
-
-        for(let item of this.industryManagementListFilter){
+        for (let item of this.industryManagementListFilter) {
           let indexOf = this.industryManagementListFilter.indexOf(item);
           console.log(indexOf);
-           if(item.codigo == data.codigo){
-              data.dataInicioPlanejamento = this.moment(new Date(data.dataInicioPlanejamento.year, data.dataInicioPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
-              data.dataFimPlanejamento = this.moment(new Date(data.dataFimPlanejamento.year, data.dataFimPlanejamento.month, data.dataFimPlanejamento.day)).format('YYYY-MM-DD');
-              this.industryManagementListFilter.splice(indexOf, 1, data);
-
-
-           }
+          if (item.codigo == data.codigo) {
+            data.dataInicioPlanejamento = this.moment(
+              new Date(
+                data.dataInicioPlanejamento.year,
+                data.dataInicioPlanejamento.month,
+                data.dataFimPlanejamento.day
+              )
+            ).format("YYYY-MM-DD");
+            data.dataFimPlanejamento = this.moment(
+              new Date(
+                data.dataFimPlanejamento.year,
+                data.dataFimPlanejamento.month,
+                data.dataFimPlanejamento.day
+              )
+            ).format("YYYY-MM-DD");
+            this.industryManagementListFilter.splice(indexOf, 1, data);
+          }
         }
-
-
-
-      
       });
-
-
     },
   },
   async mounted() {
@@ -624,6 +786,17 @@ export default {
         codigoFilial: "",
         codigoExterno: "",
       },
+      newOccurence: {
+        nome: "",
+        status: 0,
+        descricao: "",
+        dataOcorrencia: "",
+        codigoUsuario: "",
+        codigoFilial: "",
+        codigoProcessoIndustrial: "",
+      },
+      showOccurenceWindow: false,
+      ocurrenceIndustryManagement: null,
       processToExclude: null,
       showProcessWindow: false,
       showProcessRemoveWindow: false,
