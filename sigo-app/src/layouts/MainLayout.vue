@@ -209,7 +209,7 @@ export default {
         {
           icon: "supervisor_account",
           text: "Consultoria",
-          to: "/sigo/consultoria",
+          to: "/sigo/consultorias",
         },
       ],
     };

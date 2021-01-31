@@ -32,7 +32,7 @@ import com.sigo.api.token.JwtTokenDecoder;
 
 @RestController
 @RequestMapping("/consultancy")
-public class NormaResource {
+public class ConsultoriaResource {
 
 	@Autowired
 	private ConsultoriaRepository consultoriaRepository;
@@ -97,7 +97,7 @@ public class NormaResource {
 	@GetMapping
 	public ResponseEntity<?> findAll() {
 		List<Consultoria> findAll = consultoriaRepository.findAll();
-
+ 
 		return ResponseEntity.ok(findAll);
 	}
 
@@ -110,9 +110,7 @@ public class NormaResource {
 		}
 
 		consultoriaRepository.delete(codigo);
-		S3 s3 = new S3();
-		s3.remove(codigo.toString());
-
+	
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}
