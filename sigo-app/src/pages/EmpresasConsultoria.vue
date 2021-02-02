@@ -56,12 +56,7 @@
             }}
           </td>
           <td class="text-left q-gutter-xs">
-            <q-btn
-              color="teal"
-              label="Download"
-              dense
-              @click="downloadConsultancy(consultancy)"
-            />
+           
             <q-btn
               v-if="admin == true"
               color="red"
@@ -176,7 +171,7 @@ import {
   uploadConsultancy,
   deleteConsultancy,
   getConsultancyPdf,
-} from "../services/Consultoria";
+} from "../services/EmpresasConsultoria";
 
 import { isMyUserAdmin } from "../services/Usuario";
 import { cnpjValidation } from "../util/validadorCnpj";

@@ -28,7 +28,7 @@ public class S3 {
 				.withRegion(Regions.US_EAST_2).build();
 	}
 
-	public void save(MultipartFile arquivo, String codigo) {
+	public void save(MultipartFile arquivo, String codigoConsultoria, String codigo) {
 
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentType(arquivo.getContentType());
@@ -37,7 +37,7 @@ public class S3 {
 		String nomeUnico = codigo + ".pdf";
 
 		try {
-			PutObjectRequest putObjectRequest = new PutObjectRequest("sigo-consultancies", nomeUnico,
+			PutObjectRequest putObjectRequest = new PutObjectRequest("sigo-consultancies-" + codigoConsultoria, nomeUnico,
 					arquivo.getInputStream(), objectMetadata);
 
 			client.putObject(putObjectRequest);
@@ -50,15 +50,15 @@ public class S3 {
 
 	}
 	
-	public InputStream get(String codigo) {
+	public InputStream get(String codigoConsultoria, String codigo) {
 		
-		S3Object object = client.getObject(new GetObjectRequest("sigo-consultancies", codigo + ".pdf"));
+		S3Object object = client.getObject(new GetObjectRequest("sigo-consultancies-" + codigoConsultoria, codigo + ".pdf"));
 		
 		return object.getObjectContent();
 	}
 
-	public void remove(String codigo) {
-		DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest("sigo-consultancies", codigo + ".pdf");
+	public void remove(String codigoConsultoria, String codigo) {
+		DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest("sigo-consultancies-" + codigoConsultoria, codigo + ".pdf");
 		client.deleteObject(deleteObjectRequest);
 		
 		System.out.println("Arquivo removido com sucesso");

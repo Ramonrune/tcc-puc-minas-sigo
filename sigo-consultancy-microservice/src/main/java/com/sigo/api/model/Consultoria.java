@@ -1,35 +1,57 @@
 package com.sigo.api.model;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.envers.Audited;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 
 @Entity
 @Audited
-@Table(name = "consultoria_assessoria")
+@Table(name = "consultoria")
 public class Consultoria {
 
 	@Id
 	private Long codigo;
-	private String nome;
-	private String cnpj;
-	private String telefone;
-	private String email;
-	@Column(name = "codigo_usuario")
-	private String codigoUsuario;
+	@Column(name = "codigo_empresa_consultoria")
+	private String codigoEmpresaConsultoria;
+
+	private String setor;
+	private String motivo;
+
 	@JsonDeserialize(using = LocalDateDeserializer.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	@Column(name = "data_registro")
-	private LocalDate dataRegistro;
+	@Column(name = "data_contratacao")
+	private LocalDate dataContratacao;
+
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@Column(name = "data_inicio")
+	private LocalDate dataInicio;
+
+	@JsonDeserialize(using = LocalDateDeserializer.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	@Column(name = "data_fim")
+	private LocalDate dataFim;
+
+	@Column(name = "codigo_filial")
+	private String codigoFilial;
+
+	@OneToMany(mappedBy = "codigoConsultoria", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@JsonIgnore
+	private List<Anexo> anexos;
 
 	public Long getCodigo() {
 		return codigo;
@@ -39,52 +61,60 @@ public class Consultoria {
 		this.codigo = codigo;
 	}
 
-	public String getNome() {
-		return nome;
+	public String getCodigoEmpresaConsultoria() {
+		return codigoEmpresaConsultoria;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
+	public void setCodigoEmpresaConsultoria(String codigoEmpresaConsultoria) {
+		this.codigoEmpresaConsultoria = codigoEmpresaConsultoria;
 	}
 
-	public String getCnpj() {
-		return cnpj;
+	public String getSetor() {
+		return setor;
 	}
 
-	public void setCnpj(String cnpj) {
-		this.cnpj = cnpj;
+	public void setSetor(String setor) {
+		this.setor = setor;
 	}
 
-	public String getTelefone() {
-		return telefone;
+	public String getMotivo() {
+		return motivo;
 	}
 
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
+	public void setMotivo(String motivo) {
+		this.motivo = motivo;
 	}
 
-	public String getEmail() {
-		return email;
+	public LocalDate getDataContratacao() {
+		return dataContratacao;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setDataContratacao(LocalDate dataContratacao) {
+		this.dataContratacao = dataContratacao;
 	}
 
-	public String getCodigoUsuario() {
-		return codigoUsuario;
+	public LocalDate getDataInicio() {
+		return dataInicio;
 	}
 
-	public void setCodigoUsuario(String codigoUsuario) {
-		this.codigoUsuario = codigoUsuario;
+	public void setDataInicio(LocalDate dataInicio) {
+		this.dataInicio = dataInicio;
 	}
 
-	public LocalDate getDataRegistro() {
-		return dataRegistro;
+	public LocalDate getDataFim() {
+		return dataFim;
 	}
 
-	public void setDataRegistro(LocalDate dataRegistro) {
-		this.dataRegistro = dataRegistro;
+	public void setDataFim(LocalDate dataFim) {
+		this.dataFim = dataFim;
+	}
+
+	public String getCodigoFilial() {
+		return codigoFilial;
+	}
+
+	public void setCodigoFilial(String codigoFilial) {
+		this.codigoFilial = codigoFilial;
 	}
 
 	@Override

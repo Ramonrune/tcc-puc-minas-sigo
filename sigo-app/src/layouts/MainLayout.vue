@@ -208,8 +208,8 @@ export default {
       links4: [
         {
           icon: "supervisor_account",
-          text: "Consultoria",
-          to: "/sigo/consultorias",
+          text: "Empresas de consultoria",
+          to: "/sigo/empresas-consultoria",
         },
       ],
     };
