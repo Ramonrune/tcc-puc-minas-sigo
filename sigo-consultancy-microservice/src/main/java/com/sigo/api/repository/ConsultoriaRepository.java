@@ -19,7 +19,7 @@ public interface ConsultoriaRepository extends JpaRepository<Consultoria, Long> 
 	@Query(value = "SELECT max(codigo) FROM Consultoria")
 	Long getMaxTransactionId();
 	
-	@Query(value = "SELECT * FROM consultoria WHERE codigo_filial = :codigoFilial AND codigo_empresa_consultoria = :codigoEmpresaConsultoria AND (data_inicio >= :dataInicio AND data_fim <= :dataFim)", nativeQuery = true)
+	@Query(value = "SELECT * FROM consultoria WHERE codigo_filial = :codigoFilial AND codigo_empresa_consultoria = :codigoEmpresaConsultoria AND (data_contratacao >= :dataInicio AND data_contratacao <= :dataFim)", nativeQuery = true)
 	List<Consultoria> findByCodigoFilialAndPeriodoData(@Param("codigoEmpresaConsultoria") Long codigoEmpresaConsultoria, @Param("codigoFilial") Long codigoFilial, @Param("dataInicio") LocalDate dataInicio, @Param("dataFim") LocalDate dataFim);
 
 }

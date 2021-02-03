@@ -49,7 +49,7 @@ export const uploadConsultancy = async (file, codigo) => {
 
 
 
-export const getConsultancy = async () => {
+export const getCompaniesConsultancy = async () => {
     const config = {
         headers: {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,

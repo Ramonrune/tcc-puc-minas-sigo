@@ -211,6 +211,11 @@ export default {
           text: "Empresas de consultoria",
           to: "/sigo/empresas-consultoria",
         },
+         {
+          icon: "supervisor_account",
+          text: "Consultorias",
+          to: "/sigo/consultoria",
+        },
       ],
     };
   },

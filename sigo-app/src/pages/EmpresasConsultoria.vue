@@ -167,7 +167,7 @@ import Vue from "vue";
 
 import {
   addNewConsultancy,
-  getConsultancy,
+  getCompaniesConsultancy,
   uploadConsultancy,
   deleteConsultancy,
   getConsultancyPdf,
@@ -306,7 +306,7 @@ export default {
       return;
     },
     async refreshList() {
-      this.consultancyList = await getConsultancy();
+      this.consultancyList = await getCompaniesConsultancy();
     },
     downloadConsultancy(consultancy) {
       getConsultancyPdf(consultancy);

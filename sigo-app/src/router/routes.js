@@ -31,6 +31,7 @@ const routes = [
       { name: 'processo', path: 'processo', component: () => import('pages/ProcessoDetalhes.vue') },
       { path: 'ocorrencias', component: () => import('pages/Ocorrencias.vue') },
       { path: 'empresas-consultoria', component: () => import('pages/EmpresasConsultoria.vue') },
+      { path: 'consultoria', component: () => import('pages/Consultoria.vue') },
       { path: 'relatorios', component: () => import('pages/Relatorios.vue') },
       { path: 'filiais', component: () => import('pages/Filiais.vue') },
       { path: 'usuarios', component: () => import('pages/Usuarios.vue') },

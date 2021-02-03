@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -29,6 +30,9 @@ public class Consultoria {
 	private String codigoEmpresaConsultoria;
 
 	private String setor;
+
+	@Column(name = "motivo", length = 100000, columnDefinition = "TEXT")
+	@Lob
 	private String motivo;
 
 	@JsonDeserialize(using = LocalDateDeserializer.class)
