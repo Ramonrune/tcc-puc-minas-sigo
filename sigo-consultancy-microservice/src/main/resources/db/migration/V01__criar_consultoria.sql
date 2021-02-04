@@ -25,6 +25,7 @@ CREATE TABLE anexo(
 	codigo BIGINT(20) PRIMARY KEY,
     codigo_consultoria BIGINT(20) NOT NULL,
 	titulo VARCHAR(200) NOT NULL,
+    tipo VARCHAR(100) NOT NULL,
     data DATE NOT NULL,
     origem SMALLINT NOT NULL,
 	FOREIGN KEY (codigo_consultoria) REFERENCES consultoria(codigo) ON DELETE CASCADE

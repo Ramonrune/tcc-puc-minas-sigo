@@ -8,6 +8,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,6 +48,8 @@ public class AnexoResource {
 		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
+		
+		System.out.println("chegou aqui");
 
 		S3 s3 = new S3();
 		s3.save(uploadfile, codigoConsultoria.toString(), codigo.toString());
@@ -96,8 +99,20 @@ public class AnexoResource {
 	}
 
 	@GetMapping
-	public ResponseEntity<?> findAll() {
-		List<Anexo> findAll = anexoRepository.findAll();
+	public ResponseEntity<?> findAll(@RequestParam("codigoConsultoria") Long codigoConsultoria,
+			@RequestHeader(name = "Authorization") String token) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+
+		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		Anexo anexo = new Anexo();
+		anexo.setCodigoConsultoria(codigoConsultoria.toString());
+		
+		
+		Example<Anexo> of = Example.of(anexo);
+		List<Anexo> findAll = anexoRepository.findAll(of);
 
 		return ResponseEntity.ok(findAll);
 	}

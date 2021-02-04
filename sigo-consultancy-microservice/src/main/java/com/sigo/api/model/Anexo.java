@@ -29,6 +29,8 @@ public class Anexo {
 	@Column(name = "data")
 	private LocalDate data;
 
+	private String tipo;
+
 	public Long getCodigo() {
 		return codigo;
 	}
@@ -67,6 +69,14 @@ public class Anexo {
 
 	public void setData(LocalDate data) {
 		this.data = data;
+	}
+
+	public String getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(String tipo) {
+		this.tipo = tipo;
 	}
 
 	@Override
