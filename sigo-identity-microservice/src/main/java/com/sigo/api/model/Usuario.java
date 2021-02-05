@@ -2,6 +2,7 @@ package com.sigo.api.model;
 
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -27,11 +28,14 @@ public class Usuario {
 	private String email;
 	private String senha;
 
+	@Column(name = "codigo_consultoria")
+	private Long codigoConsultoria;
+
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuario_permissao", joinColumns = @JoinColumn(name = "codigo_usuario"), inverseJoinColumns = @JoinColumn(name = "codigo_permissao"))
 	private List<Permissao> permissoes;
 
-	@OneToMany(fetch=FetchType.EAGER)
+	@OneToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "usuario_filial", joinColumns = @JoinColumn(name = "codigo_usuario"), inverseJoinColumns = @JoinColumn(name = "codigo_filial"))
 	@Fetch(value = FetchMode.SUBSELECT)
 	private List<Filial> filiais;
@@ -82,6 +86,14 @@ public class Usuario {
 
 	public void setFiliais(List<Filial> filiais) {
 		this.filiais = filiais;
+	}
+
+	public Long getCodigoConsultoria() {
+		return codigoConsultoria;
+	}
+
+	public void setCodigoConsultoria(Long codigoConsultoria) {
+		this.codigoConsultoria = codigoConsultoria;
 	}
 
 	@Override

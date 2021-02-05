@@ -13,9 +13,13 @@
         <q-card square class="shadow-5" style="width: 400px">
           <q-card-section class="bg-white">
             <br />
-            <img alt="Sigo" src="~assets/sigo-logo.png" style="position: absolute;left: 8px; top: 30px;" />
+            <img
+              alt="Sigo"
+              src="~assets/sigo-logo.png"
+              style="position: absolute; left: 8px; top: 30px"
+            />
             <br />
-            <span style="position: relative; top: 20px;font-size: 18px; "
+            <span style="position: relative; top: 20px; font-size: 18px"
               >Entre com seu e-mail e senha</span
             >
           </q-card-section>
@@ -57,9 +61,7 @@
               @click="this.validate"
             />
           </q-card-actions>
-          <q-card-section class="text-center q-pa-sm">
-            <p class="text-grey-6">Esqueceu sua senha?</p>
-          </q-card-section>
+          <br>
         </q-card>
       </div>
     </div>
@@ -69,14 +71,21 @@
 <script>
 import { login } from "../services/Login";
 import { getUserInfo } from "../services/Usuario";
+import {
+  isMyUserAdmin,
+  isMyUserCommon,
+  isMyUserAudit,
+} from "../services/Usuario";
 
 export default {
   name: "Login",
 
   data() {
     return {
-      email: "admin@sigo.com",
-      password: "admin",
+      //email: "admin@sigo.com",
+      //password: "admin",
+      email: 'consultor@gmail.com',
+      password: '1111',
       loading: false,
     };
   },
@@ -116,7 +125,6 @@ export default {
       this.loading = true;
       let response = await login(this.email, this.password);
       if (response != null && response.status == 200) {
-
         let { access_token, codigo, nome } = response.data;
         localStorage.setItem("TOKEN", access_token);
         localStorage.setItem("CODE", codigo);
@@ -129,7 +137,16 @@ export default {
             "USER_DATA",
             JSON.stringify(responseUserInfo.data)
           );
-          window.location.href = "#/sigo";
+
+
+          if (isMyUserAdmin() || isMyUserCommon()) {
+            window.location.href = "#/sigo";
+          }
+
+          if (isMyUserAudit()) {
+            window.location.href = "#/sigo/consultor";
+          }
+
         } else {
           this.$q.notify({
             color: "negative",
@@ -160,7 +177,6 @@ export default {
       }
 
       this.loading = false;
-
 
       console.log(response);
     },

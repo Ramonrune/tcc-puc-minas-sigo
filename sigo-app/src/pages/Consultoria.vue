@@ -160,6 +160,7 @@
           </td>
           <td class="text-left q-gutter-xs">
             <q-btn
+              v-if="admin == true"
               color="teal"
               label="Gerenciar"
               dense
@@ -286,6 +287,8 @@
                   label="Arquivo"
                   counter
                   class="col-6"
+                  :filter="checkFileType"
+                  @rejected="onRejected"
                 >
                   <template v-slot:prepend>
                     <q-icon name="cloud_upload" />
@@ -344,7 +347,10 @@
                     <q-btn color="grey-7" round flat icon="more_vert">
                       <q-menu cover auto-close>
                         <q-list>
-                          <q-item clickable @click="downloadAttachment(attachment)">
+                          <q-item
+                            clickable
+                            @click="downloadAttachment(attachment)"
+                          >
                             <q-item-section>Download</q-item-section>
                           </q-item>
                           <q-item
@@ -493,6 +499,28 @@ import { isMyUserAdmin } from "../services/Usuario";
 export default {
   name: "Processos",
   methods: {
+    checkFileType(files) {
+      return files.filter(
+        (file) =>
+          file.type === "application/pdf" ||
+          file.type ==
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+          file.type ==
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+          file.type ==
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+    },
+    onRejected(rejectedEntries) {
+      // Notify plugin needs to be installed
+      // https://quasar.dev/quasar-plugins/notify#Installation
+      this.$q.notify({
+        color: "negative",
+        message: `Tipo do arquivo deve ser PDF, WORD, EXCEL ou POWER POINT!`,
+        position: "top",
+        timeout: 1000,
+      });
+    },
     async doManagement(consultancy) {
       this.attachments = [];
       console.log(this.file);

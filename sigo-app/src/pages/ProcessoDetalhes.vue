@@ -31,7 +31,7 @@
       <q-space />
 
       <div>
-        <div class="row">
+        <div class="row" v-if="admin == true">
           <q-card class="my-card" v-if="logisticsResponse.length != 0">
             <q-card-section class="bg-primary text-white">
               <div class="text-h6">Insumos</div>
@@ -168,6 +168,7 @@
           </td>
           <td class="text-left">
             <q-input
+              :disable="admin == false"
               style="max-width: 125px"
               @input="
                 (val) => {

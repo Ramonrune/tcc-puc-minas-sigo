@@ -136,3 +136,24 @@ export const isMyUserAdmin = () => {
 
     return hasAdmin;
 }
+
+export const isMyUserCommon = () => {
+    let userData = JSON.parse(localStorage.getItem("USER_DATA"));
+    let hasAdmin =
+      userData.permissoes.filter((e) => e.descricao == "ROLE_COMMON_USER").length > 0
+        ? true
+        : false;
+
+    return hasAdmin;
+}
+
+
+export const isMyUserAudit = () => {
+    let userData = JSON.parse(localStorage.getItem("USER_DATA"));
+    let hasAdmin =
+      userData.permissoes.filter((e) => e.descricao == "ROLE_AUDIT_USER").length > 0
+        ? true
+        : false;
+
+    return hasAdmin;
+}

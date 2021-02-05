@@ -204,6 +204,7 @@
           </td>
           <td class="text-left q-gutter-xs">
             <q-btn
+              v-if="admin == true"
               color="orange"
               label="Nova ocorrência"
               dense
@@ -215,7 +216,7 @@
 
             <q-btn
               color="teal"
-              label="Visualizar"
+              label="Gerenciar"
               dense
               @click="navigate(industryManagement)"
             />

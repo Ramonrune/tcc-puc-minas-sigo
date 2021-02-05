@@ -71,64 +71,6 @@
             </q-item-section>
           </q-item>
 
-          <q-separator inset class="q-my-sm" />
-
-          <q-item
-            class="GNL__drawer-item"
-            v-ripple
-            v-for="link in links2"
-            :key="link.text"
-            clickable
-            :to="link.to"
-            style="text-decoration: none"
-          >
-            <q-item-section avatar>
-              <q-icon :name="link.icon" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ link.text }}</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-separator inset class="q-my-sm" />
-
-          <q-item
-            class="GNL__drawer-item"
-            v-ripple
-            v-for="link in links3"
-            :key="link.text"
-            clickable
-            :to="link.to"
-            style="text-decoration: none"
-          >
-            <q-item-section avatar>
-              <q-icon :name="link.icon" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ link.text }}</q-item-label>
-            </q-item-section>
-          </q-item>
-
-          <q-separator inset class="q-my-sm" />
-
-          <q-item
-            class="GNL__drawer-item"
-            v-ripple
-            v-for="link in links4"
-            :key="link.text"
-            clickable
-            :to="link.to"
-            style="text-decoration: none"
-          >
-            <q-item-section avatar>
-              <q-icon :name="link.icon" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ link.text }}</q-item-label>
-            </q-item-section>
-          </q-item>
-
-       
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -159,37 +101,7 @@ export default {
       byWebsite: "",
       byDate: "Any time",
       links1: [
-        { id: "home", icon: "web", text: "Painel", to: "/sigo" },
-        { id: "users", icon: "person", text: "Usuários", to: "/sigo/usuarios" },
-        {
-          id: "companies",
-          icon: "domain",
-          text: "Filiais",
-          to: "/sigo/filiais",
-        },
-        {
-          id: "reports",
-          icon: "bar_chart",
-          text: "Relatórios",
-          to: "/sigo/relatorios",
-        },
-      ],
-      links2: [
-        { icon: "view_list", text: "Processos", to: "/sigo/processos" },
-        { icon: "warning", text: "Ocorrências", to: "/sigo/ocorrencias" },
-      ],
-      links3: [{ icon: "book", text: "Normas técnicas", to: "/sigo/normas" }],
-      links4: [
-        {
-          icon: "supervisor_account",
-          text: "Empresas de consultoria",
-          to: "/sigo/empresas-consultoria",
-        },
-         {
-          icon: "supervisor_account",
-          text: "Consultorias",
-          to: "/sigo/consultoria",
-        },
+        { id: "home", icon: "web", text: "Painel", to: "/sigo/consultor" },
       ],
     };
   },

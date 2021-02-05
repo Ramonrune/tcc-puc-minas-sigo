@@ -56,7 +56,7 @@
           </q-card-section>
         </q-card>
       </div>
-      <div class="col-xs-12 col-sm-4 col-4">
+      <div :class="!isUserAdmin() ? 'col-xs-12 col-sm-6 col-6' : 'col-xs-12 col-sm-4 col-4'">
         <q-card style="height: 100%">
           <q-card-section>
             <div class="text-h6">Total de processos</div>
@@ -67,7 +67,7 @@
           <bar-chart></bar-chart>
         </q-card>
       </div>
-      <div class="col-xs-12 col-sm-4 col-4">
+      <div :class="!isUserAdmin() ? 'col-xs-12 col-sm-6 col-6' : 'col-xs-12 col-sm-4 col-4'">
         <q-card style="height: 100%">
           <q-card-section>
             <div class="text-h6">Tecidos mais fabricados</div>
@@ -78,7 +78,7 @@
           <area-chart></area-chart>
         </q-card>
       </div>
-      <div class="col-xs-12 col-sm-4 col-4">
+      <div class="col-xs-12 col-sm-4 col-4" v-if="isUserAdmin() == true">
         <q-card style="height: 100%">
           <q-card-section>
             <div class="text-h6">Receitas e despesas</div>
@@ -123,10 +123,19 @@ import AreaChart from "../components/AreaChart";
 import SplineChart from "../components/SplineChart";
 import ColumnChart from "../components/ColumnChart";
 import TimelineChart from "../components/TimelineChart";
+import { isMyUserAdmin, isMyUserCommon } from "../services/Usuario";
 
 export default {
   name: "PageIndex",
   components: { BarChart, AreaChart, SplineChart, ColumnChart, TimelineChart },
+  methods: {
+    isUserCommon(){
+      return isMyUserCommon();
+    },
+    isUserAdmin(){
+      return isMyUserAdmin();
+    }
+  },
   mounted() {
     let userData = JSON.parse(localStorage.getItem("USER_DATA"));
     this.companies = userData.filiais;

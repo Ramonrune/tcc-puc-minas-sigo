@@ -1,3 +1,4 @@
+import { isMyUserAdmin, isMyUserCommon, isMyUserAudit } from "../services/Usuario";
 
 const routes = [
   {
@@ -15,7 +16,7 @@ const routes = [
     beforeEnter(to, from, next) {
       let token = localStorage.getItem("TOKEN");
 
-      if (token == "null" || token == null) {
+      if (token == "null" || token == null && (!isMyUserAdmin() || !isMyUserCommon)) {
         next({name: 'login'});
         window.location.href = "#/";
 
@@ -38,6 +39,28 @@ const routes = [
       { path: '403', component: () => import('pages/Error403.vue') },
 
 
+
+    ]
+  },
+
+  {
+    path: '/sigo/consultor',
+    component: () => import('layouts/AuditLayout.vue'),
+    beforeEnter(to, from, next) {
+      let token = localStorage.getItem("TOKEN");
+
+      if (token == "null" || token == null || !isMyUserAudit()) {
+        next({name: 'login'});
+        window.location.href = "#/";
+
+      }
+      else{
+        next();
+      }
+    },
+    children: [
+      { path: '', component: () => import('pages/PainelAuditor.vue') },
+  
 
     ]
   },

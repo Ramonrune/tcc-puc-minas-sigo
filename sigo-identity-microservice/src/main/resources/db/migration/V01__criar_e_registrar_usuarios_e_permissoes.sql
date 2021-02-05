@@ -2,7 +2,8 @@ CREATE TABLE usuario(
 	codigo BIGINT(20) PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
     email VARCHAR(50) NOT NULL,
-    senha VARCHAR(150) NOT NULL
+    senha VARCHAR(150) NOT NULL,
+    codigo_consultoria BIGINT(20)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 

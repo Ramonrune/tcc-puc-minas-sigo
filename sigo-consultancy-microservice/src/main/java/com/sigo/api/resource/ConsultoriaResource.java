@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +31,6 @@ public class ConsultoriaResource {
 
 	@Autowired
 	private ConsultoriaRepository consultoriaRepository;
-	
-
 
 	@PostMapping
 	public ResponseEntity<?> save(@Valid @RequestBody Consultoria consultoria,
@@ -51,9 +50,16 @@ public class ConsultoriaResource {
 		return ResponseEntity.status(HttpStatus.CREATED).body(save);
 	}
 
+	@GetMapping("/all")
+	public ResponseEntity<?> findAll() {
+
+		List<Consultoria> findByCodigoFilialAndPeriodoData = consultoriaRepository.findAll();
+
+		return ResponseEntity.ok(findByCodigoFilialAndPeriodoData);
+	}
+
 	@GetMapping
-	public ResponseEntity<?> findAll(
-			@RequestParam(name = "codigo_empresa_consultoria") Long codigoEmpresaConsultoria,
+	public ResponseEntity<?> findAll(@RequestParam(name = "codigo_empresa_consultoria") Long codigoEmpresaConsultoria,
 			@RequestParam("codigo_filial") Long codigoFilial,
 			@RequestParam("data_inicio") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
 			@RequestParam("data_fim") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
@@ -68,8 +74,6 @@ public class ConsultoriaResource {
 		return ResponseEntity.ok(findByCodigoFilialAndPeriodoData);
 	}
 
-
-
 	@DeleteMapping("/{codigo}")
 	public ResponseEntity<?> remove(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
@@ -83,8 +87,5 @@ public class ConsultoriaResource {
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
 	}
-	
-
-	
 
 }

@@ -38,6 +38,10 @@
             </div>
           </td>
           <td class="text-left">
+            <div v-if="user.filiais.length == 0">
+              <q-badge outline color="green" label="CONSULTORIA" />
+
+            </div>
             <div v-for="filial in user.filiais" :key="filial.codigo">
               <q-badge outline color="green" :label="filial.nome" />
             </div>
@@ -112,7 +116,33 @@
               class="col-12"
             />
 
-            <div class="row col-12">
+            <q-select
+              filled
+              v-model="selectedConsultancy"
+              :options="consultancyList"
+              option-value="codigo"
+              option-label="setor"
+              emit-value
+              map-options
+              label="Consultoria"
+              class="col-12"
+              v-if="
+                typeof selectedPermission === 'object' &&
+                selectedPermission != null
+                  ? selectedPermission.codigo == 3
+                  : selectedPermission == 3
+              "
+            />
+
+            <div
+              class="row col-12"
+              v-if="
+                typeof selectedPermission === 'object' &&
+                selectedPermission != null
+                  ? selectedPermission.codigo != 3
+                  : selectedPermission != 3
+              "
+            >
               <q-select
                 filled
                 v-model="selectedCompany"
@@ -135,7 +165,15 @@
               />
             </div>
 
-            <q-markup-table style="width: 100%">
+            <q-markup-table
+              style="width: 100%"
+              v-if="
+                typeof selectedPermission === 'object' &&
+                selectedPermission != null
+                  ? selectedPermission.codigo != 3
+                  : selectedPermission != 3
+              "
+            >
               <thead>
                 <tr>
                   <th class="text-left">Nome</th>
@@ -224,12 +262,15 @@ import {
 
 import { getCompanies } from "../services/Filial";
 import { getPermissoes } from "../services/Permissao";
+import { getAllConsultancies } from "../services/Consultoria";
 
 export default {
   name: "Usuarios",
 
   data() {
     return {
+      selectedConsultancy: null,
+      consultancyList: [],
       render: false,
       userList: [],
       companiesList: [],
@@ -246,6 +287,7 @@ export default {
         confirmarSenha: "",
         permissoes: [],
         filiais: [],
+        codigoConsultoria: "",
       },
       selectedCompany: null,
       selectedPermission: null,
@@ -308,10 +350,12 @@ export default {
         confirmarSenha: "",
         filiais: [],
         permissoes: [],
+        codigoConsultoria: "",
       };
 
       this.selectedCompany = null;
       this.selectedPermission = null;
+      this.selectedConsultancy = null;
     },
     showEdit(user) {
       this.mode = "EDIT";
@@ -320,6 +364,7 @@ export default {
       this.newUser = cloneUser;
 
       this.selectedPermission = cloneUser.permissoes[0];
+      this.selectedConsultancy = cloneUser.codigoConsultoria;
 
       console.log(this.newUser);
 
@@ -353,6 +398,7 @@ export default {
       this.userList = await getUsers();
       this.companiesList = await getCompanies();
       this.permissionsList = await getPermissoes();
+      this.consultancyList = await getAllConsultancies();
     },
     async emailExists(email) {
       return await userExists(email);
@@ -434,20 +480,54 @@ export default {
         return;
       }
 
-      if (this.newUser.filiais.length == 0) {
-        this.$q.notify({
-          color: "negative",
-          message: "Adicione pelo menos uma filial!",
-          position: "top",
-          timeout: 1000,
-        });
-        return;
+      if (
+        typeof this.selectedPermission === "object"
+          ? this.selectedPermission.codigo == 3
+          : this.selectedPermission == 3
+      ) {
+        if (this.selectedConsultancy == null) {
+          this.$q.notify({
+            color: "negative",
+            message: "Informe a consultoria!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
       }
 
+      if (
+        typeof this.selectedPermission === "object"
+          ? this.selectedPermission.codigo != 3
+          : this.selectedPermission != 3
+      ) {
+        if (this.newUser.filiais.length == 0) {
+          this.$q.notify({
+            color: "negative",
+            message: "Adicione pelo menos uma filial!",
+            position: "top",
+            timeout: 1000,
+          });
+          return;
+        }
+      }
+      else{
+        this.newUser.filiais = [];
+      }
+
+      console.log(this.selectedPermission);
+      console.log(typeof this.selectedPermission);
       this.newUser.permissoes = [];
       this.newUser.permissoes = this.permissionsList.filter(
-        (e) => e.codigo == this.selectedPermission
+        (e) =>
+          e.codigo ==
+          (typeof this.selectedPermission === "object"
+            ? this.selectedPermission.codigo
+            : this.selectedPermission)
       );
+
+      console.log(this.newUser.permissoes);
+      this.newUser.codigoConsultoria = this.selectedConsultancy;
 
       let body = {
         nome: this.newUser.nome,
@@ -455,6 +535,7 @@ export default {
         senha: this.newUser.senha,
         filiais: this.newUser.filiais,
         permissoes: this.newUser.permissoes,
+        codigoConsultoria: this.newUser.codigoConsultoria,
       };
 
       console.log(body);

@@ -40,6 +40,25 @@ export const getConsultancy = async (codigoEmpresaConsultoria, codigoFilial, dat
 
 
 
+export const getAllConsultancies = async () => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+    };
+    return await Vue.prototype.$axios.get(`/api/v1/consultancy/all`, config).then(response => {
+        if (response.status == 200) {
+            return response.data;
+        }
+        return [];
+    }).catch(err => {
+        return [];
+    });
+
+}
+
+
+
 export const deleteConsultancy = async (id) => {
 
     const config = {
