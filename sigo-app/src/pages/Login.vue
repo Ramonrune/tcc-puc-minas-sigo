@@ -82,10 +82,10 @@ export default {
 
   data() {
     return {
-      //email: "admin@sigo.com",
-      //password: "admin",
-      email: 'consultor@gmail.com',
-      password: '1111',
+      email: "admin@sigo.com",
+      password: "admin",
+      //email: 'consultor@gmail.com',
+      //password: '1111',
       loading: false,
     };
   },

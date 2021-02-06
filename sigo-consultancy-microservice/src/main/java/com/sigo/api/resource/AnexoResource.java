@@ -45,9 +45,9 @@ public class AnexoResource {
 			@RequestParam("codigo_consultoria") Long codigoConsultoria) throws IOException {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
-		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
+//		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//		}
 		
 		System.out.println("chegou aqui");
 
@@ -63,9 +63,9 @@ public class AnexoResource {
 			@RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
-		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
+//		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//		}
 
 		Long maxTransactionId = anexoRepository.getMaxTransactionId();
 		maxTransactionId = maxTransactionId != null ? maxTransactionId : 0;
@@ -103,9 +103,9 @@ public class AnexoResource {
 			@RequestHeader(name = "Authorization") String token) {
 		JsonWebToken decoded = JwtTokenDecoder.decode(token);
 
-		if (!decoded.getAuthorities().contains("ROLE_ADMIN")) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
+//		if (!decoded.getAuthorities().contains("ROLE_ADMIN") || !decoded.getAuthorities().contains("ROLE_AUDIT_USER")) {
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//		}
 		
 		Anexo anexo = new Anexo();
 		anexo.setCodigoConsultoria(codigoConsultoria.toString());

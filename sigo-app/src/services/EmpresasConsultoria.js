@@ -68,6 +68,25 @@ export const getCompaniesConsultancy = async () => {
 
 
 
+
+export const getOneCompanyConsultancy = async (codigo) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+    };
+    return await Vue.prototype.$axios.get(`/api/v1/company-consultancy/${codigo}`, config).then(response => {
+        if (response.status == 200) {
+            return response.data;
+        }
+        return [];
+    }).catch(err => {
+        return [];
+    });
+
+}
+
+
 export const getConsultancyPdf = async (consultancy) => {
     const config = {
         responseType: 'blob',

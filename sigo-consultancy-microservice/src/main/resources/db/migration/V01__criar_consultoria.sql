@@ -6,7 +6,6 @@ CREATE TABLE empresa_consultoria(
     email VARCHAR(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
 CREATE TABLE consultoria(
 	codigo BIGINT(20) PRIMARY KEY,
     codigo_empresa_consultoria BIGINT(20) NOT NULL,
@@ -21,6 +20,7 @@ CREATE TABLE consultoria(
 
 
 
+
 CREATE TABLE anexo(
 	codigo BIGINT(20) PRIMARY KEY,
     codigo_consultoria BIGINT(20) NOT NULL,
@@ -30,4 +30,6 @@ CREATE TABLE anexo(
     origem SMALLINT NOT NULL,
 	FOREIGN KEY (codigo_consultoria) REFERENCES consultoria(codigo) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
  

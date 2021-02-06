@@ -25,7 +25,7 @@ CREATE TABLE usuario_permissao(
 
 INSERT INTO usuario (codigo, nome, email, senha) values (1, 'Administrador', 'admin@sigo.com', '$2a$10$X607ZPhQ4EgGNaYKt3n4SONjIv9zc.VMWdEuhCuba7oLAL5IvcL5.');
 INSERT INTO usuario (codigo, nome, email, senha) values (2, 'Ramon Lacava Gutierrez Gonçales', 'ramonrune@gmail.com', '$2a$10$X607ZPhQ4EgGNaYKt3n4SONjIv9zc.VMWdEuhCuba7oLAL5IvcL5.');
-INSERT INTO usuario (codigo, nome, email, senha) values (3, 'José dos Santos', 'jose_dos_santos@gmail.com', '$2a$10$X607ZPhQ4EgGNaYKt3n4SONjIv9zc.VMWdEuhCuba7oLAL5IvcL5.');
+INSERT INTO usuario (codigo, nome, email, senha, codigo_consultoria) values (3, 'José dos Santos', 'jose_dos_santos@gmail.com', '$2a$10$X607ZPhQ4EgGNaYKt3n4SONjIv9zc.VMWdEuhCuba7oLAL5IvcL5.', 1);
 
 INSERT INTO permissao (codigo, descricao) values (1, 'ROLE_ADMIN');
 INSERT INTO permissao (codigo, descricao) values (2, 'ROLE_COMMON_USER');

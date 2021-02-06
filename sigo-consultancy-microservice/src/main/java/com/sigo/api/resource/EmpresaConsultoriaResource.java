@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sigo.api.model.Consultoria;
 import com.sigo.api.model.EmpresaConsultoria;
 import com.sigo.api.model.JsonWebToken;
 import com.sigo.api.repository.EmpresaConsultoriaRepository;
@@ -54,6 +55,17 @@ public class EmpresaConsultoriaResource {
 		List<EmpresaConsultoria> findAll = empresaConsultoriaRepository.findAll();
 
 		return ResponseEntity.ok(findAll);
+	}
+	
+	@GetMapping("/{codigo}")
+	public ResponseEntity<?> get(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+
+
+		EmpresaConsultoria findOne = empresaConsultoriaRepository.findOne(codigo);
+
+		return ResponseEntity.status(HttpStatus.OK).body(findOne);
+
 	}
 
 	@DeleteMapping("/{codigo}")

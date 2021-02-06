@@ -73,6 +73,17 @@ public class ConsultoriaResource {
 
 		return ResponseEntity.ok(findByCodigoFilialAndPeriodoData);
 	}
+	
+	@GetMapping("/{codigo}")
+	public ResponseEntity<?> get(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) {
+		JsonWebToken decoded = JwtTokenDecoder.decode(token);
+
+
+		Consultoria findOne = consultoriaRepository.findOne(codigo);
+
+		return ResponseEntity.status(HttpStatus.OK).body(findOne);
+
+	}
 
 	@DeleteMapping("/{codigo}")
 	public ResponseEntity<?> remove(@PathVariable Long codigo, @RequestHeader(name = "Authorization") String token) {

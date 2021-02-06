@@ -307,7 +307,7 @@
               <br /><br />
               <div class="row">
                 <q-card
-                  v-for="attachment in attachments"
+                  v-for="attachment in attachments.filter((e) => e.origem == 1)"
                   :key="attachment.codigo + new Date().getTime()"
                   class="col-3"
                 >
@@ -381,8 +381,80 @@
             </q-tab-panel>
 
             <q-tab-panel name="resultado">
-              <div class="text-h6">Movies</div>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              <div class="text-h6">Resultado</div>
+              <div class="row">
+                <q-card
+                  v-for="attachment in attachments.filter((e) => e.origem == 2)"
+                  :key="attachment.codigo + new Date().getTime()"
+                  class="col-3"
+                >
+                  <br />
+                  <div class="col">
+                    <img
+                      src="~assets/powerpoint.png"
+                      v-if="
+                        attachment.tipo ==
+                        'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                      "
+                      style="width: 100px; margin-left: 20px"
+                    />
+                    <img
+                      src="~assets/word.png"
+                      v-if="
+                        attachment.tipo ==
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                      "
+                      style="width: 100px; margin-left: 20px"
+                    />
+                    <img
+                      src="~assets/excel.png"
+                      v-if="
+                        attachment.tipo ==
+                        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                      "
+                      style="width: 100px; margin-left: 20px"
+                    />
+                    <img
+                      src="~assets/pdf.png"
+                      v-if="attachment.tipo == 'application/pdf'"
+                      style="width: 100px; margin-left: 20px"
+                    />
+                  </div>
+                  <div style="position: absolute; top: 0; right: 0">
+                    <q-btn color="grey-7" round flat icon="more_vert">
+                      <q-menu cover auto-close>
+                        <q-list>
+                          <q-item
+                            clickable
+                            @click="downloadAttachment(attachment)"
+                          >
+                            <q-item-section>Download</q-item-section>
+                          </q-item>
+                          <q-item
+                            clickable
+                            @click="removeAttachment(attachment)"
+                          >
+                            <q-item-section>Excluir</q-item-section>
+                          </q-item>
+                        </q-list>
+                      </q-menu>
+                    </q-btn>
+                  </div>
+
+                  <q-card-section>
+                    <div style="font-size: 14px">
+                      {{ attachment.titulo }}
+                    </div>
+                    <div style="font-size: 12px">
+                      {{
+                        moment(attachment.data, "YYYY-MM-DD").format(
+                          "DD/MM/YYYY"
+                        )
+                      }}
+                    </div>
+                  </q-card-section>
+                </q-card>
+              </div>
             </q-tab-panel>
           </q-tab-panels>
         </q-card-section>
@@ -764,6 +836,8 @@ export default {
         this.newConsultancy.dataFim,
         "DD/MM/YYYY"
       ).format("YYYY-MM-DD");
+
+      body.codigoUsuario = JSON.parse(localStorage.getItem("USER_DATA")).codigo;
 
       console.log(body);
       let response = await addNewConsultancy(body);
