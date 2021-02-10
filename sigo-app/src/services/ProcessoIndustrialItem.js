@@ -7,7 +7,7 @@ export const addNewProcessItem = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/industry-management-items`,
+    return await Vue.prototype.$industryClient.post(`/industry-management-items`,
         body,
         config).then(response => {
 
@@ -28,7 +28,7 @@ export const updateItemProcessHour = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.put(`/api/v1/industry-management-items/${body.codigo}/hour/${body.hour}`,
+    return await Vue.prototype.$industryClient.put(`/industry-management-items/${body.codigo}/hour/${body.hour}`,
         body,
         config).then(response => {
 
@@ -52,7 +52,7 @@ export const updateItemProcessStatus = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.put(`/api/v1/industry-management-items/${body.codigo}/status/${body.status}`,
+    return await Vue.prototype.$industryClient.put(`/industry-management-items/${body.codigo}/status/${body.status}`,
         body,
         config).then(response => {
 
@@ -77,7 +77,7 @@ export const getIndustryManagementItemsList = async (codigo) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/industry-management-items/${codigo}`, config).then(response => {
+    return await Vue.prototype.$industryClient.get(`/industry-management-items/${codigo}`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -95,7 +95,7 @@ export const getLogistics = async (codigo) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/logistics/${codigo}`, config).then(response => {
+    return await Vue.prototype.$industryClient.get(`/logistics/${codigo}`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -114,7 +114,7 @@ export const deleteProcessItem = async (processToExclude) => {
         },
     };
     
-    return await Vue.prototype.$axios.delete(`/api/v1/industry-management-items/${processToExclude.codigo}`, config).then(response => {
+    return await Vue.prototype.$industryClient.delete(`/industry-management-items/${processToExclude.codigo}`, config).then(response => {
         if (response == undefined) {
             return  { status: 409 };
         }

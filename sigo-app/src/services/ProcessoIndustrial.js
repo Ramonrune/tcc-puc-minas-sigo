@@ -76,7 +76,7 @@ export const addNewProcess = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/industry-management`,
+    return await Vue.prototype.$industryClient.post(`/industry-management`,
         body,
         config).then(response => {
 
@@ -100,7 +100,7 @@ export const getIndustryManagementList = async (codigoFilial, dataInicioPlanejam
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/industry-management?codigo_filial=${codigoFilial}&data_inicio_planejamento=${dataInicioPlanejamento}&data_fim_planejamento=${dataFimPlanejamento}`, config).then(response => {
+    return await Vue.prototype.$industryClient.get(`/industry-management?codigo_filial=${codigoFilial}&data_inicio_planejamento=${dataInicioPlanejamento}&data_fim_planejamento=${dataFimPlanejamento}`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -118,7 +118,7 @@ export const updateProcessStatus = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.put(`/api/v1/industry-management/${body.codigo}/status/${body.status}`,
+    return await Vue.prototype.$industryClient.put(`/industry-management/${body.codigo}/status/${body.status}`,
         body,
         config).then(response => {
 
@@ -142,7 +142,7 @@ export const deleteProcess = async (processToExclude) => {
         },
     };
     
-    return await Vue.prototype.$axios.delete(`/api/v1/industry-management/${processToExclude.codigo}?codigo_filial=${processToExclude.codigoFilial}`, config).then(response => {
+    return await Vue.prototype.$industryClient.delete(`/industry-management/${processToExclude.codigo}?codigo_filial=${processToExclude.codigoFilial}`, config).then(response => {
         if (response == undefined) {
             return  { status: 409 };
         }

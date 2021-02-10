@@ -36,7 +36,7 @@ export const addNewOccurrence = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/occurrence`,
+    return await Vue.prototype.$industryClient.post(`/occurrence`,
         body,
         config).then(response => {
 
@@ -60,7 +60,7 @@ export const getOccurrenceList = async (codigoFilial, dataInicio, dataFim) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/occurrence?codigo_filial=${codigoFilial}&data_inicio=${dataInicio}&data_fim=${dataFim}`, config).then(response => {
+    return await Vue.prototype.$industryClient.get(`/occurrence?codigo_filial=${codigoFilial}&data_inicio=${dataInicio}&data_fim=${dataFim}`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -78,7 +78,7 @@ export const updateOccurrenceStatus = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.put(`/api/v1/occurrence/${body.codigo}/status/${body.status}`,
+    return await Vue.prototype.$industryClient.put(`/occurrence/${body.codigo}/status/${body.status}`,
         body,
         config).then(response => {
 
@@ -102,7 +102,7 @@ export const deleteOccurrence = async (occurrenceToExclude) => {
         },
     };
     
-    return await Vue.prototype.$axios.delete(`/api/v1/occurrence/${occurrenceToExclude.codigo}`, config).then(response => {
+    return await Vue.prototype.$industryClient.delete(`/occurrence/${occurrenceToExclude.codigo}`, config).then(response => {
         if (response == undefined) {
             return  { status: 409 };
         }

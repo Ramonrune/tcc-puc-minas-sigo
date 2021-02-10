@@ -6,7 +6,7 @@ export const addNewAttachment = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/attachment`,
+    return await Vue.prototype.$consultancyClient.post(`/attachment`,
         body,
         config).then(response => {
 
@@ -32,7 +32,7 @@ export const uploadAttachment = async (file, codigo, codigoConsultoria) => {
     let bodyFormData = new FormData();
     bodyFormData.append('file', file);
 
-    return await Vue.prototype.$axios.post(`/api/v1/attachment/upload/${codigo}?codigo_consultoria=${codigoConsultoria}`,
+    return await Vue.prototype.$consultancyClient.post(`/attachment/upload/${codigo}?codigo_consultoria=${codigoConsultoria}`,
         bodyFormData,
         config).then(response => {
 
@@ -55,7 +55,7 @@ export const getAttachments = async (codigoConsultoria) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/attachment?codigoConsultoria=${codigoConsultoria}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.get(`/attachment?codigoConsultoria=${codigoConsultoria}`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -75,7 +75,7 @@ export const getAttachmentPdf = async (attachment) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/attachment/${attachment.codigo}?codigo_consultoria=${attachment.codigoConsultoria}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.get(`/attachment/${attachment.codigo}?codigo_consultoria=${attachment.codigoConsultoria}`, config).then(response => {
         const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
 
         const link = document.createElement('a');
@@ -127,7 +127,7 @@ export const deleteAttachment = async (id, codigoConsultoria) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.delete(`/api/v1/attachment/${id}?codigo_consultoria=${codigoConsultoria}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.delete(`/attachment/${id}?codigo_consultoria=${codigoConsultoria}`, config).then(response => {
         if (response.status == 204) {
             return response;
         }

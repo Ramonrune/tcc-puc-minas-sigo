@@ -7,7 +7,7 @@ export const addNewCompany = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/companies`,
+    return await Vue.prototype.$identityClient.post(`/companies`,
         body,
         config).then(response => {
 
@@ -28,7 +28,7 @@ export const editCompany = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.put(`/api/v1/companies/${body.codigo}`,
+    return await Vue.prototype.$identityClient.put(`/companies/${body.codigo}`,
         body,
         config).then(response => {
 
@@ -50,7 +50,7 @@ export const getCompanies = async () => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/companies`, config).then(response => {
+    return await Vue.prototype.$identityClient.get(`/companies`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -70,7 +70,7 @@ export const companyExists = async (cnpj) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/companies/exists/${cnpj}`, config).then(response => {
+    return await Vue.prototype.$identityClient.get(`/companies/exists/${cnpj}`, config).then(response => {
         if (response.status == 200) {
             return false;
         }
@@ -89,7 +89,7 @@ export const deleteCompany = async (id) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.delete(`/api/v1/companies/${id}`, config).then(response => {
+    return await Vue.prototype.$identityClient.delete(`/companies/${id}`, config).then(response => {
         if (response == undefined) {
             return  { status: 409 };
         }

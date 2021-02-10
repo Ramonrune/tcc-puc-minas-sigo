@@ -6,7 +6,7 @@ export const addNewConsultancy = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/consultancy`,
+    return await Vue.prototype.$consultancyClient.post(`/consultancy`,
         body,
         config).then(response => {
 
@@ -27,7 +27,7 @@ export const getConsultancy = async (codigoEmpresaConsultoria, codigoFilial, dat
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/consultancy?codigo_empresa_consultoria=${codigoEmpresaConsultoria}&codigo_filial=${codigoFilial}&data_inicio=${dataInicio}&data_fim=${dataFim}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.get(`/consultancy?codigo_empresa_consultoria=${codigoEmpresaConsultoria}&codigo_filial=${codigoFilial}&data_inicio=${dataInicio}&data_fim=${dataFim}`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -46,7 +46,7 @@ export const getAllConsultancies = async () => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/consultancy/all`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.get(`/consultancy/all`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -64,7 +64,7 @@ export const getOneConsultancy = async (codigo) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/consultancy/${codigo}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.get(`/consultancy/${codigo}`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -85,7 +85,7 @@ export const deleteConsultancy = async (id) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.delete(`/api/v1/consultancy/${id}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.delete(`/consultancy/${id}`, config).then(response => {
         if (response.status == 204) {
             return response;
         }

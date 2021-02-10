@@ -11,7 +11,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>{
 
 	List<Usuario> findByEmail(String email);
 	
-	
 	public List<Usuario> findByPermissoesDescricao(String permissaoDescricao);
 	
 	@Query(value = "SELECT max(codigo) FROM Usuario")

@@ -47,7 +47,6 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
 		</dependency>
 		
 
@@ -107,11 +106,7 @@
 			<optional>true</optional>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-eureka</artifactId>
-			<version>1.4.0.RELEASE</version>
-		</dependency>
+		
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-commons -->
 		<dependency>

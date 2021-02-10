@@ -8,7 +8,7 @@ export const getUserInfo = async (email, password) => {
         },
     };
 
-    return await Vue.prototype.$axios.get(`/api/v1/users/info`, config).then(response => {
+    return await Vue.prototype.$identityClient.get(`/users/info`, config).then(response => {
         if (response.status == 200) {
             return response;
         }
@@ -29,7 +29,7 @@ export const addNewUser = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/users`,
+    return await Vue.prototype.$identityClient.post(`/users`,
         body,
         config).then(response => {
 
@@ -50,7 +50,7 @@ export const editUser = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.put(`/api/v1/users/${body.codigo}`,
+    return await Vue.prototype.$identityClient.put(`/users/${body.codigo}`,
         body,
         config).then(response => {
 
@@ -72,7 +72,7 @@ export const getUsers = async () => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/users`, config).then(response => {
+    return await Vue.prototype.$identityClient.get(`/users`, config).then(response => {
             if (response.status == 200) {
                 return response.data;
             }
@@ -94,8 +94,7 @@ export const userExists = async (email) => {
 
     email = btoa(email);
 
-    console.log(`/api/v1/users/exists/${email}`);
-    return await Vue.prototype.$axios.get(`/api/v1/users/exists/${email}`, config).then(response => {
+    return await Vue.prototype.$identityClient.get(`/users/exists/${email}`, config).then(response => {
             if (response.status == 200) {
                 return false;
             }
@@ -114,7 +113,7 @@ export const deleteUser = async (id) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.delete(`/api/v1/users/${id}`, config).then(response => {
+    return await Vue.prototype.$identityClient.delete(`/users/${id}`, config).then(response => {
             if (response.status == 204) {
                 return response;
             }

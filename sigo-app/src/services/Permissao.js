@@ -6,7 +6,7 @@ export const getPermissoes = async () => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/permissions`, config).then(response => {
+    return await Vue.prototype.$identityClient.get(`/permissions`, config).then(response => {
             if (response.status == 200) {
                 return response.data;
             }

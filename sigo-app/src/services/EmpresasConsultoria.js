@@ -6,7 +6,7 @@ export const addNewConsultancy = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/company-consultancy`,
+    return await Vue.prototype.$consultancyClient.post(`/company-consultancy`,
         body,
         config).then(response => {
 
@@ -32,7 +32,7 @@ export const uploadConsultancy = async (file, codigo) => {
     let bodyFormData = new FormData();
     bodyFormData.append('file', file);
 
-    return await Vue.prototype.$axios.post(`/api/v1/company-consultancy/upload/${codigo}`,
+    return await Vue.prototype.$consultancyClient.post(`/company-consultancy/upload/${codigo}`,
         bodyFormData,
         config).then(response => {
 
@@ -55,7 +55,7 @@ export const getCompaniesConsultancy = async () => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/company-consultancy`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.get(`/company-consultancy`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -75,7 +75,7 @@ export const getOneCompanyConsultancy = async (codigo) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/company-consultancy/${codigo}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.get(`/company-consultancy/${codigo}`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -94,7 +94,7 @@ export const getConsultancyPdf = async (consultancy) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/company-consultancy/pdf/${consultancy.codigo}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.get(`/company-consultancy/pdf/${consultancy.codigo}`, config).then(response => {
         const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
 
         const link = document.createElement('a');
@@ -125,7 +125,7 @@ export const deleteConsultancy = async (id) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.delete(`/api/v1/company-consultancy/${id}`, config).then(response => {
+    return await Vue.prototype.$consultancyClient.delete(`/company-consultancy/${id}`, config).then(response => {
         if (response.status == 204) {
             return response;
         }

@@ -6,7 +6,7 @@ export const addNewStandard = async (body) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.post(`/api/v1/standards`,
+    return await Vue.prototype.$standardClient.post(`/standards`,
         body,
         config).then(response => {
 
@@ -32,7 +32,7 @@ export const uploadStandard = async (file, codigo) => {
     let bodyFormData = new FormData();
     bodyFormData.append('file', file);
 
-    return await Vue.prototype.$axios.post(`/api/v1/standards/upload/${codigo}`,
+    return await Vue.prototype.$standardClient.post(`/standards/upload/${codigo}`,
         bodyFormData,
         config).then(response => {
 
@@ -55,7 +55,7 @@ export const getStandards = async () => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/standards`, config).then(response => {
+    return await Vue.prototype.$standardClient.get(`/standards`, config).then(response => {
         if (response.status == 200) {
             return response.data;
         }
@@ -75,7 +75,7 @@ export const getStandardPdf = async (standard) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.get(`/api/v1/standards/pdf/${standard.codigo}`, config).then(response => {
+    return await Vue.prototype.$standardClient.get(`/standards/pdf/${standard.codigo}`, config).then(response => {
         const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
 
         const link = document.createElement('a');
@@ -106,7 +106,7 @@ export const deleteStandard = async (id) => {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
     };
-    return await Vue.prototype.$axios.delete(`/api/v1/standards/${id}`, config).then(response => {
+    return await Vue.prototype.$standardClient.delete(`/standards/${id}`, config).then(response => {
         if (response.status == 204) {
             return response;
         }

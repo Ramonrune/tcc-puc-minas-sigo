@@ -15,7 +15,7 @@ export const login = async (email, password) => {
     };
 
     console.log('aquiiiiiiiii')
-    return await Vue.prototype.$axios.post(`/oauth/token`, params, config).then(response => {
+    return await Vue.prototype.$identityClient.post(`/oauth/token`, params, config).then(response => {
         console.log(response);
         if (response.status == 200) {
             return response;
