@@ -534,6 +534,7 @@ export default {
       return;
     },
     async validate() {
+
       if (this.newProcess.nome.trim() == "") {
         this.$q.notify({
           color: "negative",

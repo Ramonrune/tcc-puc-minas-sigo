@@ -21,9 +21,10 @@ public class RabbitAmqpSigoProcessoIndustrialItemConfiguration {
 
 	@Bean
 	public CachingConnectionFactory rabbitConnectionFactory(RabbitProperties config) throws Exception {
+
 		CachingConnectionFactory connectionFactory = new CachingConnectionFactory();
 
-		connectionFactory.getRabbitConnectionFactory().setUri(System.getenv("AMQP_HOST"));
+		connectionFactory.getRabbitConnectionFactory().setUri(System.getenv("AMQP_HOST") != null ? System.getenv("AMQP_HOST") :  System.getProperty("AMQP_HOST"));
 
 		return connectionFactory;
 	}

@@ -11,15 +11,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = SigoApiApplication.class)
 public class SigoApiApplicationTests {
 
-	
+
 	@Test
 	public void testS3() {
 		
 	}
 	
+	/*
 	@Test
 	public void contextLoads() throws IOException {
-/*
+
 		String username = "***REMOVED***";
 		String password = "***REMOVED***";
 		String host = "***REMOVED***";
@@ -94,8 +95,9 @@ public class SigoApiApplicationTests {
 		
 		client.close();
 		
-		*/
+		
 
 	}
 
+*/
 }
