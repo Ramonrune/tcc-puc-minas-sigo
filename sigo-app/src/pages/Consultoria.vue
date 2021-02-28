@@ -481,7 +481,7 @@
               mask="##/##/####"
               v-model="newConsultancy.dataContratacao"
               label="Data de contratação"
-              class="col-4"
+              class="col-xs-12 col-sm-12 col-md-4"
             />
 
             <q-input
@@ -489,7 +489,7 @@
               mask="##/##/####"
               v-model="newConsultancy.dataInicio"
               label="Data de inicio"
-              class="col-4"
+              class="col-xs-12 col-sm-12 col-md-4"
             />
 
             <q-input
@@ -497,7 +497,7 @@
               mask="##/##/####"
               v-model="newConsultancy.dataFim"
               label="Data de fim"
-              class="col-4"
+              class="col-xs-12 col-sm-12 col-md-4"
             />
 
             <q-input

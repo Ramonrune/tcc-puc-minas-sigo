@@ -7,6 +7,8 @@ const routes = [
     component: () => import('layouts/LoginLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Login.vue') },
+      { path: '403', component: () => import('pages/Error403.vue') },
+
     ]
   },
 
@@ -22,6 +24,13 @@ const routes = [
 
       }
       else{
+
+        if (isMyUserAudit() && to.path != '/sigo/consultor') {
+          next({name: '403'});
+          window.location.href = "#/403";
+          return;
+        }
+        
         next();
       }
     },
@@ -36,7 +45,6 @@ const routes = [
       { path: 'relatorios', component: () => import('pages/Relatorios.vue') },
       { path: 'filiais', component: () => import('pages/Filiais.vue') },
       { path: 'usuarios', component: () => import('pages/Usuarios.vue') },
-      { path: '403', component: () => import('pages/Error403.vue') },
 
 
 
@@ -60,6 +68,7 @@ const routes = [
     },
     children: [
       { path: '', component: () => import('pages/PainelAuditor.vue') },
+
   
 
     ]

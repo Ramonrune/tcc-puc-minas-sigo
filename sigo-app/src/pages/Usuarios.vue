@@ -296,7 +296,7 @@ export default {
 
   beforeMount() {
     if (!isMyUserAdmin()) {
-      window.location.href = "#/sigo/403";
+      window.location.href = "#/403";
       return;
     }
     this.render = true;
