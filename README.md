@@ -1,7 +1,7 @@
 # TCC | PUC Minas - Sistema Integrado de Gestão e Operação
 
 
-Este repositório possui os artefatos do TCC de pós-graduação em Arquitetura de Software Distribuído da PUC MMinas. Trata-se de um protótipo de uma aplicação que realiza a gestão operacional de processos para uma empresa do setor têxtil. O objetivo deste trabalho é avaliar se a arquitetura proposta é viavel.
+Este repositório possui os artefatos do TCC de pós-graduação em Arquitetura de Software Distribuído da PUC Minas. Trata-se de um protótipo de uma aplicação que realiza a gestão operacional de processos para uma empresa do setor têxtil. O objetivo deste trabalho é avaliar se a arquitetura proposta é viavel.
 
 ## Pré-requisitos
 Para executar este projeto, são necessárias as seguintes ferramentas:
@@ -37,6 +37,8 @@ mvn install
 
 ## Arquitetura
 A arquitetura deste protótipo é baseada em microserviços, os quais se comunicam via REST, SOAP e mensageria utilizando RabbitMQ. Abaixo é possível verificar o diagrama de componentes da aplicação.
+
+![alt text](https://github.com/Ramonrune/tcc-puc-minas-sigo/blob/main/sigo-docs/Diagrama_componentes.jpg?raw=true)
 
 ## Microserviços
 
