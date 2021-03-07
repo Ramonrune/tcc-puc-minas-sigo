@@ -39,6 +39,8 @@ mvn install
 A arquitetura deste protótipo é baseada em microserviços, os quais se comunicam via REST, SOAP e mensageria utilizando RabbitMQ. Abaixo é possível verificar o diagrama de componentes da aplicação.
 
 ![alt text](https://github.com/Ramonrune/tcc-puc-minas-sigo/blob/main/sigo-docs/Diagrama_componentes.jpg?raw=true)
+![alt text](https://github.com/Ramonrune/tcc-puc-minas-sigo/blob/main/sigo-docs/Diagrama_implantacao.jpg?raw=true)
+
 
 ## Microserviços
 
